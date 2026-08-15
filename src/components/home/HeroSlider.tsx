@@ -137,7 +137,7 @@ export default function HeroSlider() {
             href={banner.link}
             // Use index in key because IDs are duplicated now
             key={`${banner.id}-${index}`} 
-            className="relative flex-none w-full sm:w-[85%] md:w-[65%] lg:w-[45%] xl:w-[40%] h-[200px] md:h-[240px] rounded-xl overflow-hidden snap-start block group-hover/card:shadow-lg transition-shadow"
+            className="relative flex-none w-full sm:w-[90%] md:w-[65%] lg:w-[45%] xl:w-[40%] h-[180px] sm:h-[200px] md:h-[240px] rounded-xl overflow-hidden snap-start block group-hover/card:shadow-lg transition-shadow"
           >
              <div 
               className="absolute inset-0 bg-cover bg-[center_top] transition-transform duration-500 group-hover/card:scale-105"
