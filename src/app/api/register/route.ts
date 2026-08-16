@@ -1,0 +1,38 @@
+import { NextResponse } from "next/server";
+import connectToDatabase from "@/lib/mongodb";
+import User from "@/models/User";
+import bcrypt from "bcryptjs";
+
+export async function POST(req: Request) {
+  try {
+    const { name, email, password, phone } = await req.json();
+
+    if (!name || !email || !password) {
+      return NextResponse.json({ message: "Please fill all required fields" }, { status: 400 });
+    }
+
+    await connectToDatabase();
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json({ message: "Email already registered" }, { status: 400 });
+    }
+
+    // Password ko secure (hash) karna
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Database me naya user create karna
+    await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+    });
+
+    return NextResponse.json({ message: "User registered successfully!" }, { status: 201 });
+  } catch (error) {
+    console.error("Registration Error:", error);
+    return NextResponse.json({ message: "An error occurred during registration" }, { status: 500 });
+  }
+}

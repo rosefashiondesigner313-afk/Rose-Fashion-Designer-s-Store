@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/lib/CartContext";
 import FloatingContact from '@/components/layout/FloatingContact';
+import Providers from '@/components/Providers';
 
 // Configure our luxury brand fonts
 const inter = Inter({ 
@@ -35,6 +36,7 @@ export default function RootLayout({
     >
       {/* Apply our brand background (cream) and text color (charcoal) */}
       <body className="min-h-full flex flex-col font-sans bg-cream text-charcoal">
+        <Providers>
         <CartProvider> {/* <-- WRAP THIS */}
         <Header />
         <main className="flex-grow">
@@ -43,6 +45,7 @@ export default function RootLayout({
         <Footer/>
         <FloatingContact />
         </CartProvider> {/* <-- WRAP THIS */}
+        </Providers>
       </body>
     </html>
   );

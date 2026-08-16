@@ -1,15 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, User, Menu, X } from 'lucide-react';
-import { useCart } from '@/lib/CartContext'; // <-- CART CONNECTED
+import { ShoppingCart, Menu, X, User as UserIcon, LogOut } from 'lucide-react';
+import { useCart } from '@/lib/CartContext'; 
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { cartCount } = useCart(); // Live cart count lene ke liye
+  const { cartCount } = useCart(); 
   const [mounted, setMounted] = useState(false);
+  
+  // Session data fetch kar rahe hain
+  const { data: session } = useSession();
 
   // Next.js hydration error se bachne ke liye
   useEffect(() => {
@@ -26,6 +30,7 @@ export default function Header() {
 
   return (
     <header className="w-full sticky top-0 z-50 bg-cream border-b border-brand-100 shadow-sm transition-all duration-300">
+      
       {/* Announcement Bar */}
       <div className="bg-brand-900 text-cream text-xs text-center py-2.5 font-sans tracking-widest uppercase">
         Premium Hand-Worked Dresses • Custom Made for You
@@ -45,8 +50,7 @@ export default function Header() {
             </button>
           </div>
 
-          {/* Logo */}
-     {/* Logo - Clean, Large & Transparent */}
+          {/* Logo - Clean, Large & Transparent */}
           <div className="flex-shrink-0 flex items-center justify-center md:justify-start flex-1 md:flex-none">
             <Link href="/" className="block hover:opacity-90 transition-opacity">
               <Image 
@@ -54,21 +58,18 @@ export default function Header() {
                 alt="Rose Fashion Designer" 
                 width={220} 
                 height={70} 
-                // Height ko bada kar diya hai (h-12 md:h-16) taaki ekdum clear aur readable ho
                 className="object-contain h-12 md:h-16 w-auto" 
                 priority 
               />
             </Link>
           </div>
 
-          {/* Desktop Navigation - ANIMATED BUTTONS */}
-         {/* Desktop Navigation - ANIMATED BUTTONS WITH BORDERS */}
+          {/* Desktop Navigation - ANIMATED BUTTONS WITH BORDERS */}
           <nav className="hidden md:flex space-x-2 lg:space-x-4">
             {navLinks.map((link) => (
               <Link 
                 key={link.name} 
                 href={link.href}
-                // NAYA: 'border border-brand-200' aur 'hover:border-brand-900' add kiya hai
                 className="group relative px-4 py-2 font-medium text-sm text-charcoal tracking-widest uppercase overflow-hidden rounded-sm border border-brand-200 hover:border-brand-900 transition-colors duration-300"
               >
                 {/* Background Fill Animation (Bottom to Top) */}
@@ -83,17 +84,42 @@ export default function Header() {
           </nav>
 
           {/* Icons (Account & Cart) */}
-          <div className="flex items-center space-x-5 md:space-x-6">
+          <div className="flex items-center space-x-3 md:space-x-6">
             
-            {/* User Login/Dashboard Icon */}
-            <Link 
-              href="/account" // Baad me isko Login/Dashboard par route karenge
-              className="group flex flex-col items-center text-charcoal hover:text-brand-900 transition-colors relative"
-            >
-              <div className="p-2 rounded-full group-hover:bg-brand-50 transition-colors duration-300">
-                <User size={22} />
+            {/* USER AUTH LOGIC (Login / Profile & Logout) */}
+            {session ? (
+              <div className="flex items-center gap-2 md:gap-4">
+                {/* User Name (Hidden on very small screens to save space) */}
+                {/* <span className="hidden sm:block text-sm font-bold text-brand-900">
+                  Hi, {session.user?.name?.split(' ')[0]}
+                </span> */}
+                <Link href="/account" className="hidden sm:block text-sm font-bold text-brand-900 hover:text-brand-700 hover:underline transition-all">
+  Hi, {session.user?.name?.split(' ')[0]}
+</Link>
+                
+                {/* Logout Button */}
+                <button 
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="group flex flex-col items-center text-charcoal hover:text-red-600 transition-colors relative"
+                  title="Logout"
+                >
+                  <div className="p-2 rounded-full group-hover:bg-red-50 transition-colors duration-300">
+                    <LogOut size={22} />
+                  </div>
+                </button>
               </div>
-            </Link>
+            ) : (
+              /* Login Icon (Jab user logged out ho) */
+              <Link 
+                href="/login"
+                className="group flex flex-col items-center text-charcoal hover:text-brand-900 transition-colors relative"
+                title="Login"
+              >
+                <div className="p-2 rounded-full group-hover:bg-brand-50 transition-colors duration-300">
+                  <UserIcon size={22} />
+                </div>
+              </Link>
+            )}
 
             {/* Live Shopping Cart */}
             <Link 
