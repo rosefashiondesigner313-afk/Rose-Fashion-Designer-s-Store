@@ -11,6 +11,10 @@ import {
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  
+  // 🚨 NAYA: Yahan humne userRole nikal liya (admin ya superadmin)
+  const userRole = (session?.user as any)?.role;
+
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -256,23 +260,55 @@ export default function AdminDashboard() {
                     </td>
 
                     <td className="p-4 align-top">
+                      {/* 🚨 NAYA: Yahan par humne "Disabled (Lock)" wala logic lagaya hai */}
                       <select 
                         value={order.status}
                         onChange={(e) => initiateStatusChange(order.orderId, e.target.value)}
-                        className={`text-sm font-bold border rounded-md p-2.5 w-full max-w-[200px] outline-none cursor-pointer transition-colors shadow-sm ${
-                          order.status === 'Cancellation Requested' ? 'border-red-400 text-red-700 bg-red-50' : 
-                          order.status === 'Cancelled' ? 'border-gray-200 text-gray-500 bg-gray-50' :
-                          order.status === 'Delivered' ? 'border-green-200 text-green-700 bg-green-50' :
-                          'border-gray-200 text-charcoal hover:border-brand-900'
+                        // disabled={order.status === 'Delivered' && userRole !== 'superadmin'}
+                        // YAHAN HAI MAGIC: Agar Delivered ya Cancelled hai, aur user Super Admin nahi hai, toh Lock kardo!
+                        disabled={(order.status === 'Delivered' || order.status === 'Cancelled') && userRole !== 'superadmin'}
+                        className={`text-sm font-bold border rounded-md p-2.5 w-full max-w-[200px] outline-none transition-colors shadow-sm ${
+                          order.status === 'Delivered' && userRole !== 'superadmin' ? 'cursor-not-allowed opacity-60 bg-gray-100 border-gray-200 text-gray-500' :
+                          order.status === 'Cancellation Requested' ? 'border-red-400 text-red-700 bg-red-50 cursor-pointer' : 
+                          order.status === 'Cancelled' ? 'border-gray-200 text-gray-500 bg-gray-50 cursor-pointer' :
+                          order.status === 'Delivered' ? 'border-green-200 text-green-700 bg-green-50 cursor-pointer' :
+                          'border-gray-200 text-charcoal hover:border-brand-900 cursor-pointer'
                         }`}
                       >
-                        <option value="Order Placed">Order Placed</option>
-                        <option value="Processing">Processing</option>
+                       {/* 🚨 2. FORWARD-ONLY LOGIC STARTS HERE */}
+                        
+                        {/* Order Placed ko tabhi allow karo jab order naya ho */}
+                        <option 
+                          value="Order Placed" 
+                          disabled={userRole !== 'superadmin' && order.status !== 'Order Placed'}
+                        >
+                          Order Placed
+                        </option>
+                        
+                        {/* Processing ko tabhi allow karo jab order Shipped na hua ho */}
+                        <option 
+                          value="Processing" 
+                          disabled={userRole !== 'superadmin' && order.status === 'Shipped'}
+                        >
+                          Processing
+                        </option>
+                        
                         <option value="Shipped">Shipped</option>
                         <option value="Delivered">Delivered</option>
+                        
                         <option value="Cancellation Requested" disabled>Cancellation Requested</option>
+                        
+                        {/* Cancel kisi bhi stage par ho sakta hai (jab tak deliver na ho jaye) */}
                         <option value="Cancelled">Cancelled</option>
+
                       </select>
+                      
+                      {/* Lock Message - Shop wale ko dikhega */}
+                      {(order.status === 'Delivered' || order.status === 'Cancelled') && userRole !== 'superadmin' && (
+                         <p className="text-[10px] text-red-400 mt-1 uppercase font-bold tracking-wide">
+                           🔒 Locked by System.
+                         </p>
+                      )}
                     </td>
 
                   </tr>

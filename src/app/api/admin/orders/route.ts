@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import connectToDatabase from '@/lib/mongodb';
 import Order from '@/models/Order';
-import User from '@/models/User'; // 🚨 NAYA: User model import kiya
+import User from '@/models/User';
 
 // 1. Saare orders fetch karna (Read)
 export async function GET() {
@@ -16,13 +16,13 @@ export async function GET() {
 
     await connectToDatabase();
 
-    // 🚨 MASTER FIX: Direct Database se check karo ki user ADMIN hai ya nahi
+    // 🚨 MASTER FIX: Allow BOTH admin and superadmin
     const dbUser = await User.findOne({ email: session.user.email });
-    if (!dbUser || dbUser.role !== 'admin') {
-      return NextResponse.json({ message: 'Access Denied: You are not an Admin' }, { status: 403 });
+    if (!dbUser || (dbUser.role !== 'admin' && dbUser.role !== 'superadmin')) {
+      return NextResponse.json({ message: 'Access Denied: You do not have permission' }, { status: 403 });
     }
 
-    // Agar admin hai, toh saare orders fetch karo
+    // Agar admin ya superadmin hai, toh orders bhej do
     const orders = await Order.find().sort({ createdAt: -1 });
     return NextResponse.json({ success: true, orders });
   } catch (error) {
@@ -41,10 +41,10 @@ export async function PUT(req: Request) {
 
     await connectToDatabase();
 
-    // 🚨 MASTER FIX: Security check from DB
+    // 🚨 MASTER FIX: Allow BOTH admin and superadmin to update
     const dbUser = await User.findOne({ email: session.user.email });
-    if (!dbUser || dbUser.role !== 'admin') {
-      return NextResponse.json({ message: 'Access Denied: You are not an Admin' }, { status: 403 });
+    if (!dbUser || (dbUser.role !== 'admin' && dbUser.role !== 'superadmin')) {
+      return NextResponse.json({ message: 'Access Denied: You do not have permission' }, { status: 403 });
     }
 
     const { orderId, status } = await req.json();
