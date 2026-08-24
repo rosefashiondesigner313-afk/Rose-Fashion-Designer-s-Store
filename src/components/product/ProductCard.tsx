@@ -16,18 +16,16 @@ export default function ProductCard({ product }: { product: Product }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   const defaultSize = product.sizes[0];
-  const defaultColor = product.colors[0];
+  // const defaultColor = product.colors[0]; // Iski ab zaroorat nahi hai
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); 
     addToCart({
-      id: `${product.id}-${defaultSize}-${defaultColor}`,
-      productId: product.id,
+      id: `${product.id}-${defaultSize}`, // Yahan se color hata diya
       name: product.name,
       price: product.price,
       image: product.images[0],
       size: defaultSize,
-      color: defaultColor,
       quantity: 1
     });
   };
@@ -37,7 +35,6 @@ export default function ProductCard({ product }: { product: Product }) {
     handleAddToCart(e);
     router.push('/cart'); 
   };
-
   // Naya Function: Heart button click handle karne ke liye
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault(); // Isse link click nahi hoga, sirf heart red hoga
