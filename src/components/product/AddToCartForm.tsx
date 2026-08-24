@@ -12,16 +12,16 @@ export default function AddToCartForm({ product }: { product: Product }) {
 
   const handleAddToCart = () => {
     addToCart({
-      id: `${product.id}-${selectedSize}-${selectedColor}`,
-      productId: product.id,
+      id: `${product.id}-${selectedSize}`, // Yahan se bhi color hata diya
       name: product.name,
       price: product.price,
       image: product.images[0],
       size: selectedSize,
-      color: selectedColor,
       quantity: 1
     });
   };
+  
+ 
 
   return (
     <div className="mt-4 space-y-6">
