@@ -131,6 +131,15 @@ export default function AdminDashboard() {
           <ShieldCheck size={32} /> Business Control Panel
         </h1>
         <p className="font-sans text-brand-100 text-sm">Monitor revenue, pending payments, and order fulfillment</p>
+        {/* 🚀 NAYA BUTTON: Inventory page par jaane ke liye */}
+        <div className="mt-6 flex justify-center">
+          <a 
+            href="/admin/inventory" 
+            className="flex items-center gap-2 bg-cream text-brand-900 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-gray-100 transition-colors shadow-lg"
+          >
+            <PackageSearch size={18} /> Manage Inventory (Dresses)
+          </a>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">

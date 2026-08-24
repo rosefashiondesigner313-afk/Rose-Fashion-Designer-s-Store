@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Phone, Mail } from 'lucide-react'; // Sirf inko import kiya hai
+import { MapPin, Phone, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -25,7 +25,7 @@ export default function Footer() {
               Premium hand-worked women's dresses, Anarkali suits, and customized designer wear. Crafted with elegance and delivered with trust across India.
             </p>
             
-            {/* Social Media Icons (Using raw SVG instead of lucide-react) */}
+            {/* Social Media Icons */}
             <div className="flex space-x-5">
               <a href="#" target="_blank" className="text-brand-100 hover:text-gold hover:-translate-y-1 transition-all duration-300" aria-label="Instagram">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
@@ -58,8 +58,9 @@ export default function Footer() {
             <h3 className="font-serif text-xl font-semibold mb-6 text-gold tracking-wide uppercase text-sm">Customer Care</h3>
             <ul className="space-y-3 text-sm text-brand-50">
               <li><Link href="/track-order" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Track Your Order</Link></li>
-              <li><Link href="#" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Return & Refund Policy</Link></li>
-              <li><Link href="#" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Shipping Information</Link></li>
+              {/* 🚀 NAYE LINKS YAHAN HAIN */}
+              <li><Link href="/refund-policy" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Return & Replacement Policy</Link></li>
+              <li><Link href="/contact-us" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Contact Us</Link></li>
               <li><Link href="#" className="hover:text-gold hover:pl-1 transition-all duration-300 block">FAQs</Link></li>
             </ul>
           </div>
@@ -70,15 +71,15 @@ export default function Footer() {
             <ul className="space-y-4 text-sm text-brand-50">
               <li className="flex items-start space-x-3">
                 <MapPin size={18} className="text-gold flex-shrink-0 mt-0.5" />
-                <span className="leading-snug">123 Luxury Boutique Street, Fashion District, Mumbai, 400001</span>
+                <span className="leading-snug">Shop No 07, Building No 24b, Lallubhai Compound, Govandi East, Mumbai, Maharashtra 400043</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone size={18} className="text-gold flex-shrink-0" />
-                <span>+91 98765 43210</span>
+                <span>+91 9594444591</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail size={18} className="text-gold flex-shrink-0" />
-                <a href="mailto:care@rosefashion.com" className="hover:text-gold transition-colors">care@rosefashion.com</a>
+                <a href="mailto:rosefashiondesigner313@gmail.com" className="hover:text-gold transition-colors">rosefashiondesigner313@gmail.com</a>
               </li>
             </ul>
           </div>
@@ -88,10 +89,14 @@ export default function Footer() {
         {/* Bottom Copyright & Legal Bar */}
         <div className="border-t border-brand-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-brand-200">
           <p>&copy; {new Date().getFullYear()} Rose Fashion Designer. All rights reserved.</p>
+          
+          {/* 🚀 NAYE LEGAL LINKS YAHAN HAIN */}
           <div className="flex space-x-4">
-            <Link href="#" className="hover:text-gold transition-colors">Privacy Policy</Link>
+            <Link href="/privacy-policy" className="hover:text-gold transition-colors">Privacy Policy</Link>
             <span className="text-brand-700">|</span>
-            <Link href="#" className="hover:text-gold transition-colors">Terms of Service</Link>
+            <Link href="/terms-conditions" className="hover:text-gold transition-colors">Terms & Conditions</Link>
+            <span className="text-brand-700">|</span>
+            <Link href="/disclaimer" className="hover:text-gold transition-colors">Disclaimer</Link>
           </div>
         </div>
         

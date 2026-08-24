@@ -1,81 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ChevronDown, SlidersHorizontal, X, ShoppingBag, Star } from 'lucide-react';
-import { useCart } from '@/lib/CartContext';
+import { useState } from 'react';
+import { ChevronDown, SlidersHorizontal, X } from 'lucide-react';
+import ProductCard from '@/components/product/ProductCard';
+import { mockProducts } from '@/data/mockProducts'; // ERROR FIX: Sahi data import kiya
 
 export default function ShopPage() {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   
-  const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { addToCart } = useCart();
-  const [toast, setToast] = useState('');
+  // FILTER LOGIC: Kise select kiya gaya hai uski state
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch('/api/products');
-        const data = await res.json();
-        if (res.ok && data.success) {
-          setProducts(data.products);
-        }
-      } catch (error) {
-        console.error("Failed to fetch products");
-      }
-      setLoading(false);
-    };
-    fetchProducts();
-  }, []);
+  // Automatically saari unique categories data me se nikalna
+  const allCategories = Array.from(new Set(mockProducts.map(product => product.category)));
 
-  const allCategories = Array.from(new Set(products.map(product => product.category)));
-
+  // Checkbox pe click karne ka function
   const handleCategoryChange = (category: string) => {
     setSelectedCategories(prev => 
       prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
+        ? prev.filter(c => c !== category) // Agar pehle se tick hai, toh hata do
+        : [...prev, category]              // Agar nahi hai, toh add kar do
     );
   };
 
-  const filteredProducts = products.filter(product => {
-    if (selectedCategories.length === 0) return true;
+  // Jo category select hui hai, sirf wahi products dikhana
+  const filteredProducts = mockProducts.filter(product => {
+    if (selectedCategories.length === 0) return true; // Agar kuch select nahi kiya, toh sab dikhao
     return selectedCategories.includes(product.category);
   });
 
-  const handleAddToCart = (product: any) => {
-    const defaultSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'M';
-    addToCart({
-      id: product._id,
-      name: product.name,
-      price: product.price,
-      image: product.images[0],
-      size: defaultSize,
-      quantity: 1
-    });
-    setToast(`✅ ${product.name} added to cart!`);
-    setTimeout(() => setToast(''), 3000);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-900"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-cream min-h-screen pb-16 relative">
+    <div className="bg-cream min-h-screen pb-16">
       
-      {/* Toast Notification */}
-      {toast && (
-        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-green-50 text-green-700 px-6 py-3 rounded-full shadow-lg border border-green-200 font-bold text-sm flex items-center gap-2 animate-in slide-in-from-top-5">
-          {toast}
-        </div>
-      )}
-
       {/* Page Header */}
       <div className="bg-brand-900 text-cream py-12 px-4 text-center">
         <h1 className="font-serif text-3xl md:text-5xl font-bold mb-3">Shop Collections</h1>
@@ -175,54 +131,17 @@ export default function ShopPage() {
               </select>
             </div>
 
+            {/* ERROR FIX: Ab yahan filteredProducts map ho raha hai */}
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                
                 {filteredProducts.map((product) => (
-                  <div key={product._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
-                    
-                    <div className="relative h-80 bg-gray-100 overflow-hidden">
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.name} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                      />
-                      {!product.inStock && (
-                        <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">Sold Out</div>
-                      )}
-                      {product.isFeatured && product.inStock && (
-                        <div className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md">
-                          <Star size={12} className="fill-yellow-900" /> Featured
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="p-5 flex flex-col flex-grow">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">{product.category}</p>
-                      <h3 className="font-bold text-charcoal text-lg mb-2 line-clamp-2">{product.name}</h3>
-                      
-                      <div className="flex items-center gap-3 mb-5 mt-auto">
-                        <span className="font-bold text-xl text-brand-900">₹{product.price.toLocaleString()}</span>
-                        {product.mrp && <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
-                      </div>
-                      
-                      <button 
-                        onClick={() => handleAddToCart(product)}
-                        disabled={!product.inStock}
-                        className="w-full py-3 rounded-lg bg-brand-900 text-cream font-bold text-sm hover:bg-brand-800 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                      >
-                        <ShoppingBag size={18} /> {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                      </button>
-                    </div>
-                  </div>
+                  <ProductCard key={product.id} product={product} />
                 ))}
-
               </div>
             ) : (
               <div className="text-center py-20 bg-white rounded-lg border border-gray-100">
-                <ShoppingBag size={48} className="mx-auto mb-4 opacity-20 text-brand-900" />
                 <h3 className="text-xl font-serif font-bold text-brand-900 mb-2">No dresses found</h3>
-                <p className="text-gray-500">Try selecting a different category or check back later.</p>
+                <p className="text-gray-500">Try selecting a different category.</p>
               </div>
             )}
           </main>
