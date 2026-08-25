@@ -20,10 +20,12 @@ export default function Header() {
     setMounted(true);
   }, []);
 
+  // 👇 YAHAN CHANGES KIYE HAIN: 'About Us' ko list me add kar diya hai
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Shop', href: '/shop' },
     { name: 'Custom Design', href: '/custom-design' },
+    { name: 'About Us', href: '/about-us' }, // 👈 Naya Link
     { name: 'Why Us', href: '/why-us' },
     { name: 'Track Order', href: '/track-order' },
   ];
@@ -89,13 +91,9 @@ export default function Header() {
             {/* USER AUTH LOGIC (Login / Profile & Logout) */}
             {session ? (
               <div className="flex items-center gap-2 md:gap-4">
-                {/* User Name (Hidden on very small screens to save space) */}
-                {/* <span className="hidden sm:block text-sm font-bold text-brand-900">
-                  Hi, {session.user?.name?.split(' ')[0]}
-                </span> */}
                 <Link href="/account" className="hidden sm:block text-sm font-bold text-brand-900 hover:text-brand-700 hover:underline transition-all">
-  Hi, {session.user?.name?.split(' ')[0]}
-</Link>
+                  Hi, {session.user?.name?.split(' ')[0]}
+                </Link>
                 
                 {/* Logout Button */}
                 <button 

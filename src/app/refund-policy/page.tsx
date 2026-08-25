@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Languages } from 'lucide-react';
+// import { Languages } from 'lucide-react'; // Agar use nahi ho raha toh hata sakte hain
 
 export default function RefundPolicyPage() {
   // Bhasha select karne ke liye state ('EN' ya 'HI')
@@ -26,6 +26,14 @@ export default function RefundPolicyPage() {
       sec4Text: "Since our dresses are premium and hand-worked, minor measurement variations may occasionally occur. If you face any fitting or measurement issues, please send us a personal message on WhatsApp or Email. Our team will connect with you to understand the issue and help resolve the fitting problem to the best of our abilities.",
       sec5Title: "5. Delivery Charges",
       sec5Text: "Please note that in any scenario (including replacements), the original delivery and shipping charges are strictly non-refundable and will be deducted from any adjusted amount.",
+      
+      // Naya Order Cancellation Section (English)
+      sec6Title: "6. Order Cancellation Policy",
+      sec6Text: "We process our custom-made orders quickly to ensure timely delivery. Please read our cancellation rules carefully:",
+      sec6List1: "Orders can only be cancelled within 24 hours of placement.",
+      sec6List2: "Once the order enters the manufacturing process or is dispatched, it cannot be cancelled.",
+      sec6List3: "To request a cancellation, please contact us immediately via WhatsApp or Email.",
+      
       footerHelp: "Need help with an order?",
       footerSub: "Reach out to us within 2 days of delivery.",
       footerBtn: "Contact Support"
@@ -46,6 +54,14 @@ export default function RefundPolicyPage() {
       sec4Text: "चूंकि हमारी ड्रेसेस प्रीमियम और हाथ के काम वाली होती हैं, इसलिए कभी-कभी नाप में मामूली अंतर आ सकता है। यदि आपको फिटिंग या नाप से जुड़ी कोई समस्या आती है, तो कृपया हमें WhatsApp या ईमेल पर मैसेज करें। हमारी टीम आपसे संपर्क करेगी और फिटिंग की समस्या को ठीक करने में पूरी मदद करेगी।",
       sec5Title: "5. डिलीवरी चार्ज",
       sec5Text: "कृपया ध्यान दें कि किसी भी स्थिति में (रिप्लेसमेंट सहित), मूल डिलीवरी और शिपिंग शुल्क (Delivery Charges) वापस नहीं किए जाएंगे और उन्हें काटा जाएगा।",
+      
+      // Naya Order Cancellation Section (Hindi)
+      sec6Title: "6. ऑर्डर कैंसलेशन (रद्दीकरण) पॉलिसी",
+      sec6Text: "समय पर डिलीवरी सुनिश्चित करने के लिए हम कस्टम-मेड ऑर्डर्स पर तेजी से काम करते हैं। कृपया हमारे कैंसलेशन नियम ध्यान से पढ़ें:",
+      sec6List1: "ऑर्डर प्लेस करने के 24 घंटे के भीतर ही इसे कैंसिल किया जा सकता है।",
+      sec6List2: "एक बार ऑर्डर बनने की प्रक्रिया में जाने या डिस्पैच (भेजे जाने) के बाद, इसे कैंसिल नहीं किया जा सकता।",
+      sec6List3: "कैंसलेशन का अनुरोध करने के लिए, कृपया हमें तुरंत WhatsApp या ईमेल के माध्यम से संपर्क करें।",
+      
       footerHelp: "ऑर्डर के संबंध में मदद चाहिए?",
       footerSub: "डिलीवरी के 2 दिनों के भीतर हमसे संपर्क करें।",
       footerBtn: "सपोर्ट टीम से बात करें"
@@ -115,6 +131,17 @@ export default function RefundPolicyPage() {
           <section>
             <h2 className="text-xl font-bold text-brand-900 mb-3">{current.sec5Title}</h2>
             <p className="text-gray-600">{current.sec5Text}</p>
+          </section>
+
+          {/* 🚀 Naya Order Cancellation Section Render Yahan Hoga */}
+          <section>
+            <h2 className="text-xl font-bold text-brand-900 mb-3">{current.sec6Title}</h2>
+            <p className="text-gray-600 mb-2">{current.sec6Text}</p>
+            <ul className="list-disc pl-6 text-gray-600 space-y-1">
+              <li>{current.sec6List1}</li>
+              <li>{current.sec6List2}</li>
+              <li>{current.sec6List3}</li>
+            </ul>
           </section>
 
         </div>
