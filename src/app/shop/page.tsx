@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { ChevronDown, SlidersHorizontal, X, ShoppingBag, Star } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
 
@@ -44,7 +45,8 @@ export default function ShopPage() {
     return selectedCategories.includes(product.category);
   });
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+    e.preventDefault(); // Click karne par link trigger na ho
     const defaultSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'M';
     addToCart({
       id: product._id,
@@ -137,7 +139,7 @@ export default function ShopPage() {
                 </ul>
               </div>
 
-              {/* Price Filter (UI Only for now) */}
+              {/* Price Filter */}
               <div>
                 <h3 className="font-bold text-charcoal uppercase tracking-widest text-sm mb-4 border-b border-gray-200 pb-2 flex justify-between">
                   Price <ChevronDown size={16} />
@@ -178,44 +180,62 @@ export default function ShopPage() {
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                {filteredProducts.map((product) => (
-                  <div key={product._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
-                    
-                    <div className="relative h-80 bg-gray-100 overflow-hidden">
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.name} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                      />
-                      {!product.inStock && (
-                        <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">Sold Out</div>
-                      )}
-                      {product.isFeatured && product.inStock && (
-                        <div className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md">
-                          <Star size={12} className="fill-yellow-900" /> Featured
-                        </div>
-                      )}
-                    </div>
+                {filteredProducts.map((product) => {
+                  const productIdentifier = product.slug || product._id;
+                  const hasSecondImage = product.images && product.images.length > 1;
 
-                    <div className="p-5 flex flex-col flex-grow">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">{product.category}</p>
-                      <h3 className="font-bold text-charcoal text-lg mb-2 line-clamp-2">{product.name}</h3>
+                  return (
+                    <div key={product._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
                       
-                      <div className="flex items-center gap-3 mb-5 mt-auto">
-                        <span className="font-bold text-xl text-brand-900">₹{product.price.toLocaleString()}</span>
-                        {product.mrp && <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
+                      {/* 🚀 IMAGE CLICKABLE LINK TO DETAILED PAGE */}
+                      <Link href={`/product/${productIdentifier}`} className="relative h-80 bg-gray-100 overflow-hidden block">
+                        {hasSecondImage && (
+                          <img 
+                            src={product.images[1]} 
+                            alt={`${product.name} view`} 
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 z-0" 
+                          />
+                        )}
+                        <img 
+                          src={product.images[0]} 
+                          alt={product.name} 
+                          className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 z-10 ${hasSecondImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`} 
+                        />
+
+                        {!product.inStock && (
+                          <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md z-20">Sold Out</div>
+                        )}
+                        {product.isFeatured && product.inStock && (
+                          <div className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md z-20">
+                            <Star size={12} className="fill-yellow-900" /> Featured
+                          </div>
+                        )}
+                      </Link>
+
+                      <div className="p-5 flex flex-col flex-grow">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">{product.category}</p>
+                        
+                        {/* 🚀 TITLE CLICKABLE LINK TO DETAILED PAGE */}
+                        <Link href={`/product/${productIdentifier}`}>
+                          <h3 className="font-bold text-charcoal text-lg mb-2 line-clamp-2 hover:text-brand-900 cursor-pointer">{product.name}</h3>
+                        </Link>
+                        
+                        <div className="flex items-center gap-3 mb-5 mt-auto">
+                          <span className="font-bold text-xl text-brand-900">₹{product.price.toLocaleString()}</span>
+                          {product.mrp && <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
+                        </div>
+                        
+                        <button 
+                          onClick={(e) => handleAddToCart(product, e)}
+                          disabled={!product.inStock}
+                          className="w-full py-3 rounded-lg bg-brand-900 text-cream font-bold text-sm hover:bg-brand-800 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                        >
+                          <ShoppingBag size={18} /> {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                        </button>
                       </div>
-                      
-                      <button 
-                        onClick={() => handleAddToCart(product)}
-                        disabled={!product.inStock}
-                        className="w-full py-3 rounded-lg bg-brand-900 text-cream font-bold text-sm hover:bg-brand-800 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                      >
-                        <ShoppingBag size={18} /> {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                      </button>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
               </div>
             ) : (

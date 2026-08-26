@@ -18,7 +18,6 @@ export default function InventoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState('');
   
-  // 🚀 NAYA: Pata karne ke liye ki hum Add kar rahe hain ya Edit
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const initialForm = {
@@ -26,8 +25,10 @@ export default function InventoryPage() {
     description: '',
     price: '',
     mrp: '',
-    images: '', 
+    imagesText: '',
     category: 'Custom Dress',
+    fabric: '',
+    handworkDetails: '',
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     inStock: true,
     isFeatured: false,
@@ -66,18 +67,18 @@ export default function InventoryPage() {
     }));
   };
 
-  // 🚀 NAYA: Edit Button Click Logic
   const handleEdit = (product: any) => {
     setFormData({
       ...product,
-      images: product.images[0], // Array se wapas string banaya form ke liye
-      mrp: product.mrp || ''
+      imagesText: Array.isArray(product.images) ? product.images.join('\n') : product.images,
+      mrp: product.mrp || '',
+      fabric: product.fabric || '',
+      handworkDetails: product.handworkDetails || ''
     });
     setEditingId(product._id);
     setIsModalOpen(true);
   };
 
-  // 🚀 NAYA: Delete Button Click Logic
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this dress?")) return;
     
@@ -86,26 +87,42 @@ export default function InventoryPage() {
       if (res.ok) {
         setToast('🗑️ Dress deleted successfully!');
         setTimeout(() => setToast(''), 3000);
-        fetchProducts(); // List refresh
+        fetchProducts(); 
       }
     } catch (error) {
       alert("Failed to delete");
     }
   };
 
-  // 🚀 UPDATE: Submit ab Add aur Edit dono handle karega
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     
+    const imagesArray = formData.imagesText
+      .split('\n')
+      .map((img: string) => img.trim())
+      .filter((img: string) => img.length > 0);
+
+    if (imagesArray.length === 0) {
+      alert('Kam se kam ek image URL daalna zaroori hai!');
+      setIsSaving(false);
+      return;
+    }
+
+    // Slug automatic generate karna name se (SEO friendly url ke liye)
+    const slug = formData.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+
     const payload = {
       ...formData,
+      slug,
       price: Number(formData.price),
       mrp: formData.mrp ? Number(formData.mrp) : undefined,
-      images: [formData.images]
+      images: imagesArray
     };
 
-    // Agar editingId hai, toh PUT method use karo, warna POST (New Add)
     const method = editingId ? 'PUT' : 'POST';
     if (editingId) payload._id = editingId; 
 
@@ -120,7 +137,6 @@ export default function InventoryPage() {
         setToast(editingId ? '✅ Dress updated successfully!' : '✅ New dress added!');
         setTimeout(() => setToast(''), 3000);
         
-        // Modal close aur form reset
         setIsModalOpen(false);
         setFormData(initialForm);
         setEditingId(null);
@@ -182,7 +198,6 @@ export default function InventoryPage() {
             {products.map((product) => (
               <div key={product._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group">
                 
-                {/* 🚀 IMAGE FIX: object-cover ki jagah object-contain lagaya */}
                 <div className="h-64 bg-gray-50 relative flex items-center justify-center p-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={product.images[0]} alt={product.name} className="max-w-full max-h-full object-contain" />
@@ -205,9 +220,8 @@ export default function InventoryPage() {
                     {product.mrp && <span className="text-xs text-gray-400 line-through">₹{product.mrp}</span>}
                   </div>
                   
-                  {/* 🚀 ACTION BUTTONS FIX */}
                   <div className="flex items-center justify-between border-t border-gray-100 pt-3 mt-2">
-                    <span className="text-[10px] text-gray-500 font-medium">Sizes: {product.sizes.length}</span>
+                    <span className="text-[10px] text-gray-500 font-medium">Images: {product.images?.length || 1}</span>
                     <div className="flex gap-4">
                       <button onClick={() => handleEdit(product)} className="text-gray-400 hover:text-brand-900 transition-colors"><Edit size={16} /></button>
                       <button onClick={() => handleDelete(product._id)} className="text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
@@ -223,8 +237,8 @@ export default function InventoryPage() {
       {/* MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm px-4 py-8 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-auto animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-auto animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
               <h2 className="font-serif text-2xl font-bold text-brand-900 flex items-center gap-2">
                 {editingId ? <Edit size={24} /> : <Plus size={24} />} 
                 {editingId ? 'Edit Dress' : 'Add New Dress'}
@@ -234,32 +248,57 @@ export default function InventoryPage() {
             
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4 md:col-span-2">
+                
+                <div className="space-y-2 md:col-span-2">
                   <label className="block text-xs font-bold text-charcoal uppercase tracking-wider">Dress Name *</label>
-                  <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50" />
+                  <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50 text-sm" />
                 </div>
 
-                <div className="space-y-4 md:col-span-2">
-                  <label className="block text-xs font-bold text-charcoal uppercase tracking-wider">Description *</label>
-                  <textarea required rows={3} value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50" />
+                <div className="space-y-2 md:col-span-2">
+                  <label className="block text-xs font-bold text-charcoal uppercase tracking-wider">Description (Multi-line supported) *</label>
+                  <textarea required rows={4} value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50 text-sm" />
                 </div>
 
-                <div className="space-y-4">
+                {/* 🚀 FABRIC AND HANDWORK FIELDS */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-charcoal uppercase tracking-wider">Fabric Name</label>
+                  <input type="text" placeholder="e.g. Premium Georgette" value={formData.fabric} onChange={(e) => setFormData({...formData, fabric: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50 text-sm" />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-charcoal uppercase tracking-wider">Hand-work Details</label>
+                  <input type="text" placeholder="e.g. Zardosi Embroidery" value={formData.handworkDetails} onChange={(e) => setFormData({...formData, handworkDetails: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50 text-sm" />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <label className="block text-xs font-bold text-charcoal uppercase tracking-wider">Category / Collection Name</label>
+                  <input type="text" placeholder="e.g. Designer Jumpsuits" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50 text-sm" />
+                </div>
+
+                <div className="space-y-2">
                   <label className="block text-xs font-bold text-charcoal uppercase tracking-wider flex items-center gap-1"><Tag size={14}/> Selling Price (₹) *</label>
-                  <input required type="number" min="0" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50" />
+                  <input required type="number" min="0" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50 text-sm" />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <label className="block text-xs font-bold text-charcoal uppercase tracking-wider">Original MRP (₹)</label>
-                  <input type="number" min="0" value={formData.mrp} onChange={(e) => setFormData({...formData, mrp: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50" />
+                  <input type="number" min="0" value={formData.mrp} onChange={(e) => setFormData({...formData, mrp: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50 text-sm" />
                 </div>
 
-                <div className="space-y-4 md:col-span-2">
-                  <label className="block text-xs font-bold text-charcoal uppercase tracking-wider flex items-center gap-1"><ImageIcon size={14}/> Image URL *</label>
-                  <input required type="url" value={formData.images} onChange={(e) => setFormData({...formData, images: e.target.value})} className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50" />
+                <div className="space-y-2 md:col-span-2">
+                  <label className="block text-xs font-bold text-charcoal uppercase tracking-wider flex items-center gap-1">
+                    <ImageIcon size={14}/> Image URLs (1 per line - 1st image will be Main Card image) *
+                  </label>
+                  <textarea 
+                    required 
+                    rows={4}
+                    value={formData.imagesText} 
+                    onChange={(e) => setFormData({...formData, imagesText: e.target.value})} 
+                    className="w-full border border-gray-200 rounded-md py-2.5 px-4 focus:outline-none focus:border-brand-900 bg-gray-50 font-mono text-xs" 
+                  />
                 </div>
 
-                <div className="space-y-4 md:col-span-2">
+                <div className="space-y-2 md:col-span-2">
                   <label className="block text-xs font-bold text-charcoal uppercase tracking-wider">Available Sizes</label>
                   <div className="flex flex-wrap gap-3">
                     {availableSizes.map(size => (
@@ -277,7 +316,7 @@ export default function InventoryPage() {
 
                 <div className="flex items-center gap-2">
                   <input type="checkbox" id="featured" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} className="w-4 h-4 accent-yellow-500" />
-                  <label htmlFor="featured" className="text-sm font-bold text-charcoal cursor-pointer">Mark as Featured</label>
+                  <label htmlFor="featured" className="text-sm font-bold text-charcoal cursor-pointer">Mark as Featured (Show on Home Page)</label>
                 </div>
               </div>
 

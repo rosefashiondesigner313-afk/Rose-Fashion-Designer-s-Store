@@ -19,9 +19,9 @@ const playfair = Playfair_Display({
 });
 
 // Update SEO metadata for Rose Fashion Designer
-export const metadata: Metadata = {
-  title: "Rose Fashion Designer | Premium Hand-Worked Dresses",
-  description: "Shop premium hand-worked women's dresses, Anarkali suits, and custom designer wear at Rose Fashion Designer.",
+export const metadata = {
+  title: 'Rose Fashion Designer | Luxury Hand-worked & Designer Dresses Online',
+  description: 'Explore exclusive hand-worked dresses, premium anarkalis, luxury jumpsuits, and custom-made ethnic wear by Rose Fashion Designer.',
 };
 
 export default function RootLayout({

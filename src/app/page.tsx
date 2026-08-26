@@ -1,74 +1,77 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Scissors, ShieldCheck, Truck } from 'lucide-react';
 import HeroSlider from '@/components/home/HeroSlider';
 import LeadCapture from '@/components/home/LeadCapture';
 import ProductCard from '@/components/product/ProductCard';
-import { mockProducts } from '@/data/mockProducts';
+
+
 
 export default function Home() {
+  const [trendingProducts, setTrendingProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 🚀 MONGODB SE ASALI PRODUCTS FETCH KARNA (MANUAL CONTROL KE SATH)
+  useEffect(() => {
+    const fetchTrendingProducts = async () => {
+      try {
+        const response = await fetch('/api/products');
+        const data = await response.json();
+        
+        const allProducts = Array.isArray(data) ? data : data.products || [];
+        
+        // 🔥 YAHAN HAI AAPKA ASALI CONTROL
+        // Ye line database ko bolegi: "Sirf wahi products laao jisme isFeatured true ho"
+        const selectedProducts = allProducts.filter((product: any) => product.isFeatured === true);
+        
+        setTrendingProducts(selectedProducts);
+      } catch (error) {
+        console.error("Failed to load trending products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTrendingProducts();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       
-   <HeroSlider/>
-   {/* LEAD GENERATION BANNER */}
+      <HeroSlider/>
+      
+      {/* LEAD GENERATION BANNER */}
       <LeadCapture />
 
-      {/* 2.5 TRENDING PRODUCTS (NEW!) */}
+      {/* 2.5 TRENDING PRODUCTS (REAL MONGODB DATA) */}
       <section className="py-16 px-4 max-w-7xl mx-auto w-full">
         <div className="text-center mb-12">
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-brand-900 mb-4">Trending Now</h2>
           <div className="w-24 h-1 bg-gold mx-auto"></div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-          {mockProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {/* Loading State or Products Grid */}
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-900"></div>
+          </div>
+        ) : trendingProducts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+            {trendingProducts.map((product) => (
+              <ProductCard key={product._id || product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-gray-500 py-8 border border-dashed border-gray-300 rounded-lg">
+            No featured products found. (Aapne database me abhi tak kisi product par <b>isFeatured: true</b> nahi lagaya hai).
+          </div>
+        )}
         
         <div className="text-center mt-12">
           <Link href="/shop" className="inline-block border border-brand-900 text-brand-900 px-8 py-3 font-semibold uppercase tracking-widest text-sm hover:bg-brand-900 hover:text-cream transition-colors duration-300">
             View All Dresses
-          </Link>
-        </div>
-      </section>
-
-      {/* 2. SHOP BY CATEGORY */}
-      <section className="py-20 px-4 max-w-7xl mx-auto w-full">
-        <div className="text-center mb-12">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-brand-900 mb-4">Curated Collections</h2>
-          <div className="w-24 h-1 bg-gold mx-auto"></div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Category Card 1 */}
-          <Link href="/category/anarkali-suits" className="group relative h-96 overflow-hidden block">
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 to-transparent"></div>
-            <div className="absolute bottom-6 left-6 text-cream">
-              <h3 className="font-serif text-2xl font-bold">Anarkali Suits</h3>
-              <p className="text-sm font-light mt-1 flex items-center group-hover:text-gold transition-colors">Explore <span className="ml-2">→</span></p>
-            </div>
-          </Link>
-          
-          {/* Category Card 2 */}
-          <Link href="/category/jump-suits" className="group relative h-96 overflow-hidden block">
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 to-transparent"></div>
-            <div className="absolute bottom-6 left-6 text-cream">
-              <h3 className="font-serif text-2xl font-bold">Designer Jump Suits</h3>
-              <p className="text-sm font-light mt-1 flex items-center group-hover:text-gold transition-colors">Explore <span className="ml-2">→</span></p>
-            </div>
-          </Link>
-
-          {/* Category Card 3 */}
-          <Link href="/category/hand-worked-dresses" className="group relative h-96 overflow-hidden block">
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 to-transparent"></div>
-            <div className="absolute bottom-6 left-6 text-cream">
-              <h3 className="font-serif text-2xl font-bold">Hand-Worked Dresses</h3>
-              <p className="text-sm font-light mt-1 flex items-center group-hover:text-gold transition-colors">Explore <span className="ml-2">→</span></p>
-            </div>
           </Link>
         </div>
       </section>
