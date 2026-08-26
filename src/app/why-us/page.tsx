@@ -26,7 +26,7 @@ export default function WhyUsPage() {
             <div className="relative aspect-[4/5] w-full max-w-md mx-auto rounded-t-full overflow-hidden shadow-2xl border-4 border-white">
               {/* Using one of your existing images as a beautiful placeholder */}
               <Image 
-                src="/images/slider/Anarkali-mustard-suit.webp" 
+                src="/images/product/edited-25.webp" 
                 alt="Master Craftsmanship" 
                 fill
                 className="object-cover object-top"
