@@ -23,7 +23,7 @@ export default function Home() {
         const allProducts = Array.isArray(data) ? data : data.products || [];
         
         // 🔥 YAHAN HAI AAPKA ASALI CONTROL
-        // Ye line database ko bolegi: "Sirf wahi products laao jisme isFeatured true ho"
+        // Ye line database ko bolegi: "Sirf wahi products laao jisme isFeatured true ho ook"
         const selectedProducts = allProducts.filter((product: any) => product.isFeatured === true);
         
         setTrendingProducts(selectedProducts);
