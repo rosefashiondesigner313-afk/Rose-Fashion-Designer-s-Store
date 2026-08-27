@@ -4,9 +4,10 @@ import AddToCartForm from '@/components/product/AddToCartForm';
 
 // Database API se slug ya ID ke zariye product lane ka function
 async function getProduct(slug: string) {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const baseUrl = 'https://www.rosefashiondesigner.com';
+  // const baseUrl = process.env.VERCEL_URL 
+  //   ? `https://${process.env.VERCEL_URL}` 
+  //   : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   
   
   try {
