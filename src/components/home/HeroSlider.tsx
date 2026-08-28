@@ -11,7 +11,7 @@ const banners = [
     title: "Anarkali Suits",
     subtitle: "From ₹4,999*",
     tag: "NEW ARRIVALS",
-    link: "/category/anarkali-suits",
+    link: "/shop",
   },
   {
     id: 2,
@@ -19,7 +19,7 @@ const banners = [
     title: "Custom Fits",
     subtitle: "Made to measure",
     tag: "BEST SELLER",
-    link: "/custom-design",
+    link: "/shop",
   },
   {
     id: 3,
@@ -35,7 +35,7 @@ const banners = [
     title: "Hand-Worked",
     subtitle: "Premium Quality",
     tag: "LUXURY",
-    link: "/category/hand-worked-dresses",
+    link: "/shop",
   },
   {
     id: 5,

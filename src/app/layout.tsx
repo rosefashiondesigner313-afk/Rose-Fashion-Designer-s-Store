@@ -22,6 +22,9 @@ const playfair = Playfair_Display({
 export const metadata = {
   title: 'Rose Fashion Designer | Luxury Hand-worked & Designer Dresses Online',
   description: 'Explore exclusive hand-worked dresses, premium anarkalis, luxury jumpsuits, and custom-made ethnic wear by Rose Fashion Designer.',
+// icons: {
+//     icon: '/images/rose-favicon-01.png', // Yahan apne favicon ka path de do
+//   },
 };
 
 export default function RootLayout({

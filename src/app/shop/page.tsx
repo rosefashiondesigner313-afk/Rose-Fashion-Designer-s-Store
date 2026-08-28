@@ -166,7 +166,7 @@ export default function ShopPage() {
             />
           )}
 
-          {/* Product Grid */}
+      {/* Product Grid */}
           <main className="w-full md:w-3/4">
             <div className="hidden md:flex justify-between items-center mb-6">
               <span className="text-sm text-gray-500">Showing {filteredProducts.length} results</span>
@@ -181,7 +181,17 @@ export default function ShopPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 
                 {filteredProducts.map((product) => {
-                  const productIdentifier = product.slug || product._id;
+                  const createSlug = (text: string) => {
+                    if (!text) return '';
+                    return text
+                      .toLowerCase()
+                      .trim()
+                      .replace(/[^\w\s-]/g, '')
+                      .replace(/[\s_-]+/g, '-')
+                      .replace(/^-+|-+$/g, '');
+                  };
+
+                  const productIdentifier = product.slug || createSlug(product.name) || product._id;
                   const hasSecondImage = product.images && product.images.length > 1;
 
                   return (

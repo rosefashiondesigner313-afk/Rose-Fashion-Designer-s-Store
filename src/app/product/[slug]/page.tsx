@@ -2,6 +2,16 @@ import { notFound } from 'next/navigation';
 import ProductGallery from '@/components/product/ProductGallery';
 import AddToCartForm from '@/components/product/AddToCartForm';
 
+const createSlug = (text: string) => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
 // Database API se slug ya ID ke zariye product lane ka function
 async function getProduct(slug: string) {
   const baseUrl = 'https://www.rosefashiondesigner.com';
@@ -17,7 +27,12 @@ async function getProduct(slug: string) {
     const data = await res.json();
     const allProducts = Array.isArray(data) ? data : data.products || [];
     
-    return allProducts.find((p: any) => p.slug === slug || p._id === slug);
+    // return allProducts.find((p: any) => p.slug === slug || p._id === slug);
+    // Yahan hum database ke product ke name se slug generate karke URL ke slug se match kar rahe hain
+    return allProducts.find((p: any) => {
+      const generatedSlug = createSlug(p.name);
+      return generatedSlug === slug || p.slug === slug || p._id === slug;
+    });
   } catch (error) {
     console.error("Failed to fetch product:", error);
     return null;

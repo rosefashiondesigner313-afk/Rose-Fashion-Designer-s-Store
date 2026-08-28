@@ -16,7 +16,7 @@ export default function ProductGallery({ images }: { images: string[] }) {
           alt="Product view" 
           fill 
           sizes="(max-width: 768px) 100vw, 50vw" 
-          className="object-cover object-top" 
+          className="object-contain object-top" 
           priority 
         />
       </div>
@@ -38,7 +38,7 @@ export default function ProductGallery({ images }: { images: string[] }) {
               alt={`Thumbnail ${index + 1}`} 
               fill 
               sizes="80px" 
-              className="object-cover object-top" 
+              className="object-cover object-center" 
             />
           </button>
         ))}

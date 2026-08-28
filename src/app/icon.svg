@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Clean White Background Circle with Brand Color Border -->
+  <circle cx="32" cy="32" r="31" fill="#FFFFFF" stroke="#4A0E17" stroke-width="2.5" />
+  
+  <!-- Bold Brand Color 'R' -->
+  <path d="M21 45V19h12.5c5.2 0 9 3.5 9 8.5 0 3.8-2.2 7-6 8.2L44 45h-5.8l-7.5-9.8H25V45H21zm4-13.5h8c3 0 5-1.6 5-4.5s-2-4.5-5-4.5h-8v9z" fill="#4A0E17" />
+</svg>

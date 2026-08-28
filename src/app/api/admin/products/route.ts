@@ -4,18 +4,29 @@ import connectToDatabase from '@/lib/mongodb';
 import Product from '@/models/Product';
 import User from '@/models/User';
 
-// 1. Saari Dresses fetch karna (Admin panel me list dikhane ke liye)
+// 🚀 Helper Function: Naam se URL-friendly slug banane ke liye
+const generateSlug = (text: string) => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+// 1. Saari Dresses fetch karna
 export async function GET() {
   try {
     await connectToDatabase();
-    const products = await Product.find().sort({ createdAt: -1 }); // Nayi dress sabse upar
+    const products = await Product.find().sort({ createdAt: -1 });
     return NextResponse.json({ success: true, products });
   } catch (error) {
     return NextResponse.json({ message: 'Error fetching products' }, { status: 500 });
   }
 }
 
-// 2. Nayi Dress Add karna
+// 2. Nayi Dress Add karna (Slug auto-generate hoga)
 export async function POST(req: Request) {
   try {
     const session = await getServerSession();
@@ -26,17 +37,20 @@ export async function POST(req: Request) {
 
     await connectToDatabase();
 
-    // Security: Check agar user admin ya superadmin hai
     const dbUser = await User.findOne({ email: session.user.email });
     if (!dbUser || (dbUser.role !== 'admin' && dbUser.role !== 'superadmin')) {
       return NextResponse.json({ message: 'Access Denied' }, { status: 403 });
     }
 
-    // Data frontend se aayega
     const body = await req.json();
     
-    // Naya product database me save karo
-    const newProduct = await Product.create(body);
+    // Agar slug nahi diya hai ya khali hai, toh name se generate kar lo
+    const productData = {
+      ...body,
+      slug: body.slug ? generateSlug(body.slug) : generateSlug(body.name)
+    };
+
+    const newProduct = await Product.create(productData);
 
     return NextResponse.json({ success: true, product: newProduct }, { status: 201 });
   } catch (error) {
@@ -45,7 +59,7 @@ export async function POST(req: Request) {
   }
 }
 
-// 3. Dress ko Update (Edit) karna
+// 3. Dress ko Update (Edit) karna (Purane product ka bhi slug auto-update hoga)
 export async function PUT(req: Request) {
   try {
     const session = await getServerSession();
@@ -55,8 +69,14 @@ export async function PUT(req: Request) {
     if (!dbUser || (dbUser.role !== 'admin' && dbUser.role !== 'superadmin')) return NextResponse.json({ message: 'Access Denied' }, { status: 403 });
 
     const body = await req.json();
-    const { _id, ...updateData } = body; // _id alag karo, baaki data update ke liye
+    const { _id, ...bodyData } = body; 
     
+    // Agar naam update ho raha hai ya slug missing hai, toh naya slug bana lo
+    const updateData = {
+      ...bodyData,
+      slug: bodyData.slug ? generateSlug(bodyData.slug) : generateSlug(bodyData.name)
+    };
+
     await connectToDatabase();
     const updatedProduct = await Product.findByIdAndUpdate(_id, updateData, { new: true });
     
@@ -75,7 +95,6 @@ export async function DELETE(req: Request) {
     const dbUser = await User.findOne({ email: session.user.email });
     if (!dbUser || (dbUser.role !== 'admin' && dbUser.role !== 'superadmin')) return NextResponse.json({ message: 'Access Denied' }, { status: 403 });
 
-    // URL se ID nikalna (eg: /api/admin/products?id=123)
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     

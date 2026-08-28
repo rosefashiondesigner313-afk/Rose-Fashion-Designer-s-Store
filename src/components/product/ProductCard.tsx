@@ -12,14 +12,24 @@ export default function ProductCard({ product }: { product: any }) {
   const { addToCart } = useCart();
   const router = useRouter();
   
-  // Naya State: Wishlist ko toggle karne ke liye
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Fallback sizes agar database me empty ho
   const defaultSize = (product.sizes && product.sizes.length > 0) ? product.sizes[0] : 'M';
   
-  // 🔥 IMPORTANT: Database id (._id) ya slug ko pehchanna
-  const productIdentifier = product.slug || product._id || product.id;
+  // 🚀 SMART FIX: Agar database me slug na ho, toh name se URL-friendly slug bana lo
+  const createSlug = (text: string) => {
+    if (!text) return '';
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
+  const productIdentifier = product.slug || createSlug(product.name) || product._id;
+
+  
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); 
@@ -39,22 +49,19 @@ export default function ProductCard({ product }: { product: any }) {
     router.push('/cart'); 
   };
   
-  // Function: Heart button click handle karne ke liye
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault(); 
     setIsWishlisted(!isWishlisted);
   };
 
-  // Check agar dusri image exist karti hai
   const hasSecondImage = product.images && product.images.length > 1;
 
   return (
     <div className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-brand-50">
       
-      {/* 1. Image Area (Hover Effect ke sath) */}
+      {/* 1. Image Area */}
       <Link href={`/product/${productIdentifier}`} className="relative aspect-[3/4] md:aspect-[4/5] max-h-[420px] w-full overflow-hidden bg-gray-50 block">
         
-        {/* Background (2nd) Image */}
         {hasSecondImage && (
           <Image
             src={product.images[1]}
@@ -65,7 +72,6 @@ export default function ProductCard({ product }: { product: any }) {
           />
         )}
 
-        {/* Foreground (1st) Image */}
         <Image
           src={product.images[0]}
           alt={product.name}
@@ -74,7 +80,6 @@ export default function ProductCard({ product }: { product: any }) {
           className={`absolute inset-0 object-cover object-top transition-all duration-700 z-10 ${hasSecondImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
         />
         
-        {/* Top Left: Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2 z-20">
           {product.mrp && (
             <span className="bg-brand-700 text-white text-[10px] font-bold px-3 py-1 rounded-sm uppercase tracking-widest shadow-md">
@@ -88,7 +93,6 @@ export default function ProductCard({ product }: { product: any }) {
           )}
         </div>
 
-        {/* Top Right: Wishlist Heart Button */}
         <button 
           onClick={toggleWishlist}
           className="absolute top-3 right-3 z-20 p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-all duration-300 hover:scale-110"
@@ -100,7 +104,6 @@ export default function ProductCard({ product }: { product: any }) {
           />
         </button>
 
-        {/* Bottom Right: Price Tag Over Image */}
         <div className="absolute bottom-3 right-3 z-20 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-md border border-gray-100 flex items-center gap-2">
           <span className="font-bold text-sm text-brand-900">₹{product.price.toLocaleString('en-IN')}</span>
           {product.mrp && (
