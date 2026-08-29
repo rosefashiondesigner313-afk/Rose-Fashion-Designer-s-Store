@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Menu, X, User as UserIcon, LogOut } from 'lucide-react';
+import { ShoppingCart, Menu, X, User as UserIcon, LogOut, UserCheck } from 'lucide-react';
 import { useCart } from '@/lib/CartContext'; 
 
 export default function Header() {
@@ -20,12 +20,11 @@ export default function Header() {
     setMounted(true);
   }, []);
 
-  // 👇 YAHAN CHANGES KIYE HAIN: 'About Us' ko list me add kar diya hai
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Shop', href: '/shop' },
     { name: 'Custom Design', href: '/custom-design' },
-    { name: 'About Us', href: '/about-us' }, // 👈 Naya Link
+    { name: 'About Us', href: '/about-us' },
     { name: 'Why Us', href: '/why-us' },
     { name: 'Track Order', href: '/track-order' },
   ];
@@ -66,7 +65,7 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop Navigation - ANIMATED BUTTONS WITH BORDERS */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-2 lg:space-x-4">
             {navLinks.map((link) => (
               <Link 
@@ -74,10 +73,7 @@ export default function Header() {
                 href={link.href}
                 className="group relative px-4 py-2 font-medium text-sm text-charcoal tracking-widest uppercase overflow-hidden rounded-sm border border-brand-200 hover:border-brand-900 transition-colors duration-300"
               >
-                {/* Background Fill Animation (Bottom to Top) */}
                 <span className="absolute inset-0 w-full h-0 top-auto bottom-0 bg-brand-900 transition-all duration-300 ease-out group-hover:h-full"></span>
-                
-                {/* Text that changes color on hover */}
                 <span className="relative z-10 group-hover:text-cream transition-colors duration-300">
                   {link.name}
                 </span>
@@ -86,36 +82,40 @@ export default function Header() {
           </nav>
 
           {/* Icons (Account & Cart) */}
-          <div className="flex items-center space-x-3 md:space-x-6">
+          <div className="flex items-center space-x-2 md:space-x-4">
             
-            {/* USER AUTH LOGIC (Login / Profile & Logout) */}
+            {/* 🚀 IMPROVED USER AUTH DISPLAY (Desktop & Mobile clear profile pill) */}
             {session ? (
-              <div className="flex items-center gap-2 md:gap-4">
-                <Link href="/account" className="hidden sm:block text-sm font-bold text-brand-900 hover:text-brand-700 hover:underline transition-all">
-                  Hi, {session.user?.name?.split(' ')[0]}
+              <div className="flex items-center gap-2">
+                <Link 
+                  href="/account" 
+                  className="flex items-center gap-2 bg-brand-50 hover:bg-brand-100 text-brand-900 px-3 py-1.5 rounded-full border border-brand-200 transition-all text-xs font-bold"
+                  title="View Account"
+                >
+                  <div className="w-6 h-6 rounded-full bg-brand-900 text-cream flex items-center justify-center text-[10px] font-bold">
+                    {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <span className="hidden sm:inline">
+                    Hi, {session?.user?.name ? session.user.name.split(' ')[0] : 'Account'}
+                  </span>
                 </Link>
                 
                 {/* Logout Button */}
                 <button 
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="group flex flex-col items-center text-charcoal hover:text-red-600 transition-colors relative"
+                  className="p-2 text-charcoal hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                   title="Logout"
                 >
-                  <div className="p-2 rounded-full group-hover:bg-red-50 transition-colors duration-300">
-                    <LogOut size={22} />
-                  </div>
+                  <LogOut size={20} />
                 </button>
               </div>
             ) : (
-              /* Login Icon (Jab user logged out ho) */
               <Link 
                 href="/login"
-                className="group flex flex-col items-center text-charcoal hover:text-brand-900 transition-colors relative"
-                title="Login"
+                className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-charcoal hover:text-brand-900 px-3 py-2 rounded-lg hover:bg-brand-50 transition-all"
               >
-                <div className="p-2 rounded-full group-hover:bg-brand-50 transition-colors duration-300">
-                  <UserIcon size={22} />
-                </div>
+                <UserIcon size={20} />
+                <span className="hidden sm:inline">Login</span>
               </Link>
             )}
 
@@ -127,7 +127,6 @@ export default function Header() {
               <div className="p-2 rounded-full group-hover:bg-brand-50 transition-colors duration-300 relative">
                 <ShoppingCart size={22} />
                 
-                {/* DYNAMIC CART BADGE */}
                 {mounted && cartCount > 0 && (
                   <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-brand-900 text-cream text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-md animate-in zoom-in duration-300">
                     {cartCount}
@@ -142,8 +141,31 @@ export default function Header() {
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-brand-100 shadow-lg absolute w-full left-0">
-          <div className="px-4 pt-2 pb-6 space-y-2">
+        <div className="md:hidden bg-white border-t border-brand-100 shadow-xl absolute w-full left-0">
+          <div className="px-4 pt-4 pb-6 space-y-2">
+            
+            {/* Mobile User Status Box */}
+            {session && (
+              <div className="mb-3 p-3 bg-brand-50 rounded-xl border border-brand-100 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-brand-900 text-cream flex items-center justify-center text-xs font-bold">
+                    {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Logged in as</p>
+                    <p className="text-sm font-bold text-brand-900">{session.user?.name}</p>
+                  </div>
+                </div>
+                <Link 
+                  href="/account" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-xs font-bold bg-brand-900 text-cream px-3 py-1.5 rounded-lg"
+                >
+                  My Account
+                </Link>
+              </div>
+            )}
+
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -154,6 +176,16 @@ export default function Header() {
                 {link.name}
               </Link>
             ))}
+
+            {!session && (
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block text-center px-4 py-3 text-sm font-bold tracking-widest uppercase text-cream bg-brand-900 rounded-sm mt-4"
+              >
+                Login / Register
+              </Link>
+            )}
           </div>
         </div>
       )}

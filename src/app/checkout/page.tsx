@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/CartContext';
-import { ShieldCheck, Truck, CreditCard, QrCode, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Truck, CreditCard, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 
 export default function CheckoutPage() {
@@ -13,8 +13,7 @@ export default function CheckoutPage() {
   const { cartItems, getCartTotal, clearCart } = useCart();
   
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'UPI'>('UPI'); // Default UPI ya COD select kar sakte hain
-  const [showQrModal, setShowQrModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'Online'>('Online');
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -58,16 +57,92 @@ export default function CheckoutPage() {
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (paymentMethod === 'UPI') {
-      // Agar UPI select hai toh pehle QR code popup dikhayenge
-      setShowQrModal(true);
+    if (paymentMethod === 'Online') {
+      handleRazorpayPayment();
     } else {
-      // Direct COD order execute karenge
       executeOrder('Cash on Delivery');
     }
   };
 
-  const executeOrder = async (finalPaymentMethod: string) => {
+  // 🚀 Razorpay Integration Function
+  const handleRazorpayPayment = async () => {
+    setIsLoading(true);
+
+    try {
+      // 1. Load Razorpay Script Dynamically
+      const res = await new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+      });
+
+      if (!res) {
+        alert('Razorpay SDK failed to load. Check your internet connection.');
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Create Order on Backend
+      const orderRes = await fetch('/api/razorpay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: getCartTotal() }),
+      });
+
+      const orderData = await orderRes.json();
+
+      if (!orderData.success) {
+        alert('Failed to initiate online payment. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      // 3. Open Razorpay Checkout Modal
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: 'Rose Fashion Designer',
+        description: 'Purchase Custom Hand-worked Dresses',
+        order_id: orderData.order.id,
+        handler: async function (response: any) {
+          // Payment successful hone ke baad order database me save karenge
+          await executeOrder('Online UPI / Card', response.razorpay_payment_id);
+        },
+        modal: {
+        // 🚀 YEH NAYA ADD KARNA HAI: Jab user popup cancel karega tab ye chalega
+          ondismiss: function () {
+            setIsLoading(false); // Loading hata dega taaki button stuck na ho
+            console.log('Payment checkout modal closed by user');
+          },
+        },
+        prefill: {
+          name: formData.fullName,
+          email: session?.user?.email || '',
+          contact: formData.phone,
+        },
+        theme: {
+          color: '#4A0E17', // Brand Wine/Maroon Color
+        },
+      };
+
+      const paymentObject = new (window as any).Razorpay(options);
+      paymentObject.open();
+      paymentObject.on('payment.failed', function (response: any) {
+        alert(`Payment Failed: ${response.error.description}`);
+        setIsLoading(false);
+      });
+
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Something went wrong during payment initialization.');
+      setIsLoading(false);
+    }
+  };
+
+  const executeOrder = async (finalPaymentMethod: string, paymentId?: string) => {
     setIsLoading(true);
 
     try {
@@ -82,6 +157,7 @@ export default function CheckoutPage() {
         totalAmount: getCartTotal(),
         shippingAddress: formData,
         paymentMethod: finalPaymentMethod,
+        paymentId: paymentId || 'COD',
       };
 
       const res = await fetch('/api/orders', {
@@ -92,16 +168,17 @@ export default function CheckoutPage() {
 
       const data = await res.json();
 
-      if (res.ok) {
-        setShowQrModal(false);
-        alert(`🎉 Order Placed Successfully! Your Order ID is ${data.orderId}`);
+    if (res.ok) {
         clearCart();
-        router.push('/account');
+        // 🚀 Direct success page par bhejenge orderId ke sath bina kisi alert ke
+        window.location.href = `/order-success?orderId=${data.orderId}`;
       } else {
+        console.error('Failed to place order:', data.message);
         alert('Failed to place order: ' + data.message);
         setIsLoading(false);
       }
     } catch (error) {
+      console.error('Something went wrong!', error);
       alert('Something went wrong!');
       setIsLoading(false);
     }
@@ -160,23 +237,23 @@ export default function CheckoutPage() {
               </form>
             </div>
             
-            {/* Payment Method Section (Updated with Online UPI Option) */}
+            {/* Payment Method Section */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
               <h2 className="text-xl font-bold text-brand-900 mb-6 flex items-center gap-2">
                 <CreditCard size={24} className="text-brand-900" /> Payment Method
               </h2>
 
               <div className="space-y-4">
-                {/* UPI QR Option */}
-                <label className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'UPI' ? 'border-brand-900 bg-brand-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
+                {/* Online Payment Option */}
+                <label className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'Online' ? 'border-brand-900 bg-brand-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
                   <div className="flex items-center gap-3">
-                    <input type="radio" name="payment" checked={paymentMethod === 'UPI'} onChange={() => setPaymentMethod('UPI')} className="w-4 h-4 accent-brand-900" />
+                    <input type="radio" name="payment" checked={paymentMethod === 'Online'} onChange={() => setPaymentMethod('Online')} className="w-4 h-4 accent-brand-900" />
                     <div>
-                      <span className="font-bold text-sm text-brand-900 block">Pay Online via UPI / QR Code</span>
-                      <span className="text-xs text-gray-500">Google Pay, PhonePe, Paytm, BHIM</span>
+                      <span className="font-bold text-sm text-brand-900 block">Pay Online via UPI, Card, NetBanking (Razorpay)</span>
+                      <span className="text-xs text-gray-500">Google Pay, PhonePe, Paytm, Cards, UPI</span>
                     </div>
                   </div>
-                  <QrCode size={24} className="text-brand-900" />
+                  <CreditCard size={24} className="text-brand-900" />
                 </label>
 
                 {/* COD Option */}
@@ -230,56 +307,13 @@ export default function CheckoutPage() {
                 disabled={isLoading}
                 className="w-full bg-brand-900 text-cream py-4 rounded-md font-bold uppercase tracking-widest text-sm hover:bg-brand-800 transition-colors shadow-md flex items-center justify-center gap-2 disabled:opacity-70"
               >
-                {isLoading ? 'Processing...' : <><ShieldCheck size={20} /> {paymentMethod === 'UPI' ? 'Proceed to QR Payment' : 'Place Order'}</>}
+                {isLoading ? 'Processing...' : <><ShieldCheck size={20} /> {paymentMethod === 'Online' ? 'Proceed to Pay Securely' : 'Place COD Order'}</>}
               </button>
             </div>
           </div>
 
         </div>
       </div>
-
-      {/* 🚀 UPI QR CODE MODAL POPUP */}
-      {showQrModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center space-y-6 animate-in zoom-in-95 duration-200">
-            <h3 className="font-serif text-2xl font-bold text-brand-900">Scan & Pay via UPI</h3>
-            <p className="text-xs text-gray-500">Scan this QR code using Google Pay, PhonePe, Paytm, or any UPI app to complete your payment.</p>
-            
-            {/* Dynamic UPI QR Code */}
-            <div className="bg-gray-50 p-4 rounded-2xl border-2 border-dashed border-brand-200 inline-block">
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=rosefashion@upi&pn=RoseFashion&am=${getCartTotal()}&cu=INR`} 
-                alt="UPI QR Code" 
-                className="w-48 h-48 mx-auto rounded-lg"
-              />
-            </div>
-
-            <div className="bg-brand-50 p-3 rounded-xl">
-              <p className="text-xs text-gray-600">Amount to Pay:</p>
-              <p className="text-xl font-bold text-brand-900">₹{getCartTotal().toLocaleString()}</p>
-            </div>
-
-            <div className="space-y-3">
-              <button 
-                type="button"
-                disabled={isLoading}
-                onClick={() => executeOrder('Online UPI')}
-                className="w-full py-3.5 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-700 transition-colors shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <CheckCircle2 size={18} /> {isLoading ? 'Verifying...' : 'I Have Paid Successfully'}
-              </button>
-              <button 
-                type="button"
-                onClick={() => setShowQrModal(false)}
-                className="w-full py-2.5 text-gray-500 hover:text-gray-700 text-xs font-bold"
-              >
-                Cancel / Change Payment Method
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }
