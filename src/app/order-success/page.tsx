@@ -2,7 +2,7 @@
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle2, Package, ArrowRight } from 'lucide-react';
-import { Suspense } from 'node_modules/react'; // ya 'react'
+import { Suspense } from 'react';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
