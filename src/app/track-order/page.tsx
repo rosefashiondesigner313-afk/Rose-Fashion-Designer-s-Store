@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Package, CheckCircle2, Truck, Home } from 'lucide-react';
 
-export default function TrackOrderPage() {
+function TrackOrderContent() {
   const searchParams = useSearchParams();
   const initialOrderId = searchParams.get('id') || '';
 
@@ -61,7 +61,7 @@ export default function TrackOrderPage() {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         
-        {/* Tracking Form Card - Ye ab gayab nahi hoga */}
+        {/* Tracking Form Card */}
         <div className="bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-gray-100">
           <form onSubmit={handleTrack} className="flex flex-col md:flex-row gap-4">
             <div className="flex-grow">
@@ -75,28 +75,28 @@ export default function TrackOrderPage() {
                 required 
               />
             </div>
-          <div className="flex-grow">
-  <label className="block text-xs font-bold text-charcoal uppercase tracking-wider mb-2">Billing Phone Number *</label>
-  <div className="flex items-center w-full border border-gray-300 rounded-md bg-gray-50 focus-within:border-brand-900 transition-all">
-    {/* Permanent +91 prefix box */}
-    <span className="px-3 text-sm font-semibold text-gray-600 bg-gray-100 border-r border-gray-300 py-3 rounded-l-md">
-      +91
-    </span>
-    {/* 10-digit input field */}
-    <input 
-      type="tel" 
-      value={phone}
-      onChange={(e) => {
-        const val = e.target.value.replace(/\D/g, '');
-        if (val.length <= 10) setPhone(val);
-      }}
-      maxLength={10}
-      className="w-full py-3 px-4 focus:outline-none bg-transparent text-sm" 
-      placeholder="9876543210" 
-      required 
-    />
-  </div>
-</div>  
+
+            <div className="flex-grow">
+              <label className="block text-xs font-bold text-charcoal uppercase tracking-wider mb-2">Billing Phone Number *</label>
+              <div className="flex items-center w-full border border-gray-300 rounded-md bg-gray-50 focus-within:border-brand-900 transition-all">
+                <span className="px-3 text-sm font-semibold text-gray-600 bg-gray-100 border-r border-gray-300 py-3 rounded-l-md">
+                  +91
+                </span>
+                <input 
+                  type="tel" 
+                  value={phone}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    if (val.length <= 10) setPhone(val);
+                  }}
+                  maxLength={10}
+                  className="w-full py-3 px-4 focus:outline-none bg-transparent text-sm" 
+                  placeholder="9876543210" 
+                  required 
+                />
+              </div>
+            </div>
+
             <div className="flex items-end">
               <button 
                 type="submit" 
@@ -188,5 +188,13 @@ export default function TrackOrderPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function TrackOrderPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-brand-900">Loading tracking page...</div>}>
+      <TrackOrderContent />
+    </Suspense>
   );
 }
