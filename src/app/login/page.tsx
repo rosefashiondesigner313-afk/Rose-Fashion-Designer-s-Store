@@ -4,14 +4,15 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react'; // 👈 Icons import kiye hain
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Register
+  const [isLogin, setIsLogin] = useState(true); 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 👈 State password toggle ke liye
 
-  // Form States
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,7 +30,6 @@ export default function LoginPage() {
     setLoading(true);
 
     if (isLogin) {
-      // --- LOGIN LOGIC ---
       const res = await signIn('credentials', {
         redirect: false,
         email: formData.email,
@@ -40,11 +40,10 @@ export default function LoginPage() {
         setError('Invalid email or password');
         setLoading(false);
       } else {
-        router.push('/'); // Login successful hone par home page par bhej do
+        router.push('/');
         router.refresh();
       }
     } else {
-      // --- REGISTER LOGIC ---
       try {
         const res = await fetch('/api/register', {
           method: 'POST',
@@ -58,7 +57,6 @@ export default function LoginPage() {
           setError(data.message || 'Registration failed');
           setLoading(false);
         } else {
-          // Register successful, ab automatically login karwa do
           await signIn('credentials', {
             redirect: false,
             email: formData.email,
@@ -78,7 +76,6 @@ export default function LoginPage() {
     <div className="bg-cream min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
         
-        {/* Header (Logo / Title) */}
         <div className="text-center mb-8">
           <h2 className="font-serif text-3xl font-bold text-brand-900 mb-2">
             {isLogin ? 'Welcome Back' : 'Create an Account'}
@@ -88,7 +85,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Custom Tabs */}
         <div className="flex bg-gray-100 rounded-lg p-1 mb-8">
           <button
             onClick={() => { setIsLogin(true); setError(''); }}
@@ -104,17 +100,14 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md mb-6 text-center border border-red-100">
             {error}
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           
-          {/* Sign Up extra fields */}
           {!isLogin && (
             <>
               <div>
@@ -136,7 +129,6 @@ export default function LoginPage() {
             </>
           )}
 
-          {/* Common Fields (Email & Password) */}
           <div>
             <label className="block text-xs font-bold text-charcoal uppercase tracking-wider mb-2">Email Address *</label>
             <input 
@@ -146,18 +138,33 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* 🚀 PASSWORD FIELD WITH SHOW/HIDE TOGGLE */}
           <div>
             <label className="block text-xs font-bold text-charcoal uppercase tracking-wider mb-2">Password *</label>
-            <input 
-              type="password" name="password" required value={formData.password} onChange={handleChange}
-              className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-brand-900 transition-colors bg-transparent" 
-              placeholder="••••••••" 
-            />
+            <div className="relative">
+              <input 
+                type={showPassword ? 'text' : 'password'} 
+                name="password" 
+                required 
+                value={formData.password} 
+                onChange={handleChange}
+                className="w-full border-b border-gray-300 py-2 pr-10 focus:outline-none focus:border-brand-900 transition-colors bg-transparent" 
+                placeholder="••••••••" 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 hover:text-brand-900 p-1"
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           {isLogin && (
             <div className="flex justify-end">
-              <Link href="#" className="text-xs text-gray-500 hover:text-brand-900 transition-colors">
+              <Link href="/forgot-password" className="text-xs text-gray-500 hover:text-brand-900 transition-colors">
                 Forgot password?
               </Link>
             </div>
