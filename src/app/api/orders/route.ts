@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import connectToDatabase from '@/lib/mongodb';
 import Order from '@/models/Order';
 import User from '@/models/User';
+import { sendTelegramNotification } from '@/lib/telegram';
 
 export async function POST(req: Request) {
   try {
@@ -36,9 +37,21 @@ export async function POST(req: Request) {
       status: 'Order Placed',
     });
 
+    // Telegram Notification Send Karein
+    const message = `
+🛍️ <b>New Order Placed!</b>
+🆔 Order ID: <b>${newOrder.orderId}</b>
+👤 Customer: ${shippingAddress?.fullName || 'N/A'}
+📞 Phone: +91 ${shippingAddress?.phone || 'N/A'}
+💰 Amount: ₹${totalAmount}
+📦 Payment: ${newOrder.paymentMethod}
+`;
+
+    await sendTelegramNotification(message);
+
     return NextResponse.json({ success: true, orderId: newOrder.orderId }, { status: 201 });
   } catch (error) {
     console.error('Order creation error:', error);
     return NextResponse.json({ message: 'Failed to create order' }, { status: 500 });
   }
-}   
+}

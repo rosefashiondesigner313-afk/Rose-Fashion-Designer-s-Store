@@ -17,10 +17,16 @@ export async function GET(req: Request) {
 
     await connectToDatabase();
 
-    // 🚀 Strict Security: Order ID AND Phone number dono match hone chahiye
+    const cleanPhone = phone.trim().replace(/^\+91/, '');
+
+    // Flexible query jo +91 ke sath ya bina dono ko match karegi
     const order = await Order.findOne({ 
       orderId: orderId.trim(),
-      'shippingAddress.phone': phone.trim()
+      $or: [
+        { 'shippingAddress.phone': cleanPhone },
+        { 'shippingAddress.phone': `+91${cleanPhone}` },
+        { 'shippingAddress.phone': `+91 ${cleanPhone}` }
+      ]
     });
 
     if (!order) {
