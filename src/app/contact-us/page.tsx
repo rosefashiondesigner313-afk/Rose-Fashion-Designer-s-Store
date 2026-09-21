@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 import type { Metadata } from "next";
 import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
