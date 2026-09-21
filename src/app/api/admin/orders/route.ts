@@ -69,7 +69,8 @@ export async function PUT(req: Request) {
     // 🚀 Agar status 'Delivered' kiya gaya hai, toh User collection se email dhundh kar bhejo
     if (status.toLowerCase() === 'delivered') {
       try {
-        let customerEmail = updatedOrder.shippingAddress?.email;
+        // let customerEmail = updatedOrder.shippingAddress?.email;
+        let customerEmail = (updatedOrder.shippingAddress as any)?.email;
 
         // Agar order me email nahi hai, toh User collection se phone number match karke email nikal lo
         if (!customerEmail && updatedOrder.shippingAddress?.phone) {
