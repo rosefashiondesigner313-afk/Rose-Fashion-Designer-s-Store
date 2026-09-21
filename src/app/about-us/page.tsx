@@ -1,8 +1,17 @@
 'use client'; 
 
+import type { Metadata } from "next";
 import { useState } from 'react';
 import Link from 'next/link';
 // import Image from 'next/image'; // Jab apni local images use karein, toh isko uncomment kar lijiyega
+
+export const metadata: Metadata = {
+  title: 'About Rose Fashion Designer | Handcrafted Custom Dress Studio',
+  description: 'Learn the story behind Rose Fashion Designer — a Mumbai-based studio crafting premium hand-worked and custom-tailored dresses since 2016.',
+// icons: {
+//     icon: '/images/rose-favicon-01.png', // Yahan apne favicon ka path de do
+//   },
+};
 
 export default function AboutUsPage() {
   const [lang, setLang] = useState<'EN' | 'HI'>('EN');

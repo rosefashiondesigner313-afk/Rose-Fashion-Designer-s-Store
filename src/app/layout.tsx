@@ -19,9 +19,9 @@ const playfair = Playfair_Display({
 });
 
 // Update SEO metadata for Rose Fashion Designer
-export const metadata = {
-  title: 'Rose Fashion Designer | Luxury Hand-worked & Designer Dresses Online',
-  description: 'Explore exclusive hand-worked dresses, premium anarkalis, luxury jumpsuits, and custom-made ethnic wear by Rose Fashion Designer.',
+export const metadata: Metadata = {
+  title: 'Buy Designer Anarkali Dresses Online | Custom Hand-Worked Anarkali Suits – Rose Fashion Designer',
+  description: 'Shop premium hand-worked Anarkali dresses online, or get one custom-tailored to your measurements. Pan-India delivery from our Mumbai studio.',
 // icons: {
 //     icon: '/images/rose-favicon-01.png', // Yahan apne favicon ka path de do
 //   },

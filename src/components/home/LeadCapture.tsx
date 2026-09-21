@@ -9,11 +9,11 @@ export default function LeadCapture() {
         {/* Subtle background pattern/texture */}
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] pointer-events-none"></div>
 
-        {/* Lead Gen Text */}
+        {/* Lead Gen Text with H1 */}
         <div className="text-center lg:text-left flex-1 relative z-10">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-cream mb-3">
-            Talk to Our Master Tailors
-          </h2>
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-cream mb-4 leading-tight">
+            Designer Anarkali Dresses, Hand-Worked & Custom Made For You
+          </h1>
           <p className="font-sans text-brand-100 text-sm md:text-base max-w-lg mx-auto lg:mx-0">
             Have a specific design in mind? <span className="text-gold font-bold">Call us directly</span> or <span className="text-gold font-bold">Book a free consultation</span> to discuss measurements, fabrics, and customizations.
           </p>
@@ -24,7 +24,7 @@ export default function LeadCapture() {
           
           {/* Call Now Button */}
           <a 
-            href="tel:+919999999999" // Replace with your actual business number
+            href="tel:+91 9594444591" // Replace with your actual business number
             className="flex items-center justify-center gap-2 bg-gold text-brand-900 px-8 py-3 rounded-md font-bold hover:bg-cream transition-colors whitespace-nowrap shadow-md uppercase tracking-wide text-sm"
           >
             <PhoneCall size={20} />
