@@ -93,29 +93,29 @@ export default function AboutUsPage() {
         {/* 📸 SHOP IMAGES GALLERY (Top Section) */}
         {/* NOTE: Yahan dummy images hain. Jab aapke paas real images aa jayein, 
             toh apni images ko 'public' folder me daal kar src="/shop1.jpg" kar dijiyega */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
           <div className="relative h-48 md:h-64 rounded-xl overflow-hidden shadow-sm group">
             <img 
-              src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&q=80" 
+              src="/images/other/rose-about3.webp" 
               alt="Boutique Display" 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
           <div className="relative h-48 md:h-64 rounded-xl overflow-hidden shadow-sm group">
             <img 
-              src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80" 
+              src="/images/other/rose-about2.webp" 
               alt="Handwork Process" 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
           <div className="relative h-48 md:h-64 rounded-xl overflow-hidden shadow-sm group">
             <img 
-              src="https://images.unsplash.com/photo-1573612664822-c5ee5f458bc0?w=600&q=80" 
+              src="/images/other/rose-about4.webp" 
               alt="Premium Fabric" 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
-        </div> */}
+        </div> 
 
         {/* 👩‍🎨 OWNER PROFILE SECTION */}
         {/* Is section me Owner ki detail aur photo hai */}
