@@ -11,6 +11,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/about-us',
     '/why-us',
     '/track-order',
+    '/product/dhoti-cut-jumpsuit-latest',
+    '/product/pink-dual-shade-georgette-jumpsuit',
+    '/product/black-nida-fabric-jumpsuit-with-golden-jacket',
+    '/product/anarkali-mustard-gown',
+    '/product/dhoti-cut-jumpsuit-latest',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
