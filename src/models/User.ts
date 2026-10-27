@@ -34,7 +34,10 @@ const UserSchema = new mongoose.Schema(
       city: { type: String, default: '' },
       state: { type: String, default: '' },
       pincode: { type: String, default: '' },
-    }
+    },
+    // 🚀 FORGOT PASSWORD FIELDS ADDED:
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpire: { type: Date, default: null },
   },
   { timestamps: true }
 );
