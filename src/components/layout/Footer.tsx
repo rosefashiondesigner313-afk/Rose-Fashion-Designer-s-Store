@@ -59,6 +59,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-brand-50">
               <li><Link href="/track-order" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Track Your Order</Link></li>
               {/* 🚀 NAYE LINKS YAHAN HAIN */}
+              <li><Link href="/blogs" className="hover:text-gold hover:pl-1 transition-all duration-300 block font-semibold text-gold">Fashion Journal & Blog</Link></li>
               <li><Link href="/refund-policy" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Return & Replacement Policy</Link></li>
               <li><Link href="/contact-us" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Contact Us</Link></li>
               <li><Link href="#" className="hover:text-gold hover:pl-1 transition-all duration-300 block">FAQs</Link></li>

@@ -24,6 +24,7 @@ export default function Header() {
     { name: 'Home', href: '/' },
     { name: 'Shop', href: '/shop' },
     { name: 'Custom Design', href: '/custom-design' },
+    { name: 'Blog', href: '/blogs' },
     { name: 'About Us', href: '/about-us' },
     { name: 'Why Us', href: '/why-us' },
     { name: 'Track Order', href: '/track-order' },
