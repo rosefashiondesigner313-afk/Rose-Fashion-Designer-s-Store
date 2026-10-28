@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { blogPosts } from '@/data/blogs';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.rosefashiondesigner.com'; // Apni live domain yahan daal do
@@ -11,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/about-us',
     '/why-us',
     '/track-order',
+    '/blogs',
     '/product/dhoti-cut-jumpsuit-latest',
     '/product/pink-dual-shade-georgette-jumpsuit',
     '/product/black-nida-fabric-jumpsuit-with-golden-jacket',
@@ -21,6 +23,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
     changeFrequency: 'daily' as const,
     priority: route === '' ? 1.0 : 0.8,
+  }));
+  // 🚀 Local blog posts ko dynamic sitemap me convert karna
+  const blogPages = blogPosts.map((post) => ({
+    url: `${baseUrl}/blogs/${post.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
   }));
 
   // Agar aapke paas database se dynamic products fetch karke sitemap me dalne hain, 
@@ -35,6 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages,
+    ...blogPages,
     // ...productPages
   ];
 }
