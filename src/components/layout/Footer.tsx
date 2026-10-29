@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail, ShieldCheck, Lock } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -58,7 +58,6 @@ export default function Footer() {
             <h3 className="font-serif text-xl font-semibold mb-6 text-gold tracking-wide uppercase text-sm">Customer Care</h3>
             <ul className="space-y-3 text-sm text-brand-50">
               <li><Link href="/track-order" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Track Your Order</Link></li>
-              {/* 🚀 NAYE LINKS YAHAN HAIN */}
               <li><Link href="/blogs" className="hover:text-gold hover:pl-1 transition-all duration-300 block font-semibold text-gold">Fashion Journal & Blog</Link></li>
               <li><Link href="/refund-policy" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Return & Replacement Policy</Link></li>
               <li><Link href="/contact-us" className="hover:text-gold hover:pl-1 transition-all duration-300 block">Contact Us</Link></li>
@@ -87,11 +86,33 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom Copyright & Legal Bar */}
-        <div className="border-t border-brand-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-brand-200">
-          <p>&copy; {new Date().getFullYear()} Rose Fashion Designer. All rights reserved.</p>
+        {/* 🛡️ LARGER SECURE PAYMENTS & PAYMENT BADGES BAR */}
+        <div className="border-t border-brand-800 py-6 my-6 flex flex-col lg:flex-row items-center justify-between gap-4 text-brand-100 text-xs">
           
-          {/* 🚀 NAYE LEGAL LINKS YAHAN HAIN */}
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck size={24} className="text-gold" />
+            <span className="font-bold text-cream text-sm">100% Secure Payments</span>
+          </div>
+
+          {/* Larger Payment Badges Container */}
+          <div className="flex items-center flex-wrap justify-center gap-3 bg-white/10 px-5 py-3 rounded-xl border border-brand-700 shadow-md">
+            <span className="bg-white text-blue-900 font-extrabold text-xs px-3 py-1 rounded shadow">VISA</span>
+            <span className="bg-white text-red-600 font-extrabold text-xs px-3 py-1 rounded shadow">Mastercard</span>
+            <span className="bg-white text-black font-extrabold text-xs px-3 py-1 rounded shadow">UPI</span>
+            <span className="bg-white text-indigo-900 font-extrabold text-xs px-3 py-1 rounded shadow">Razorpay</span>
+            <span className="bg-white text-blue-600 font-extrabold text-xs px-3 py-1 rounded shadow">RuPay</span>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <Lock size={22} className="text-gold" />
+            <span className="text-sm font-semibold text-cream">256 BIT Encryption</span>
+          </div>
+        </div>
+
+        {/* Bottom Copyright & Legal Bar */}
+        <div className="border-t border-brand-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-brand-200">
+          <p>&copy; {new Date().getFullYear()} Rose Fashion Designer. All rights reserved. Developed by <Link href="https://www.prowebsdesign.com/" className="hover:text-gold transition-colors">Prowebsdesign</Link></p>
+          
           <div className="flex space-x-4">
             <Link href="/privacy-policy" className="hover:text-gold transition-colors">Privacy Policy</Link>
             <span className="text-brand-700">|</span>

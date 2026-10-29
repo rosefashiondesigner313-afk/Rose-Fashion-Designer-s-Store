@@ -112,34 +112,35 @@ export default function ProductCard({ product }: { product: any }) {
         </div>
       </Link>
 
-      {/* 2. Product Details */}
-      <div className="p-5 flex flex-col flex-grow text-center z-20 relative bg-white">
+   {/* 2. Product Details */}
+      <div className="p-4 flex flex-col flex-grow text-center z-20 relative bg-white">
         <Link href={`/product/${productIdentifier}`}>
-          <h3 className="font-serif text-lg font-bold text-brand-900 mb-1 group-hover:text-brand-500 transition-colors line-clamp-1">
+          {/* 🚀 Mobile par text size chota (text-sm) aur desktop par bada (md:text-lg) kiya hai */}
+          <h3 className="font-serif text-sm md:text-lg font-bold text-brand-900 mb-1 group-hover:text-brand-500 transition-colors line-clamp-1">
             {product.name}
           </h3>
         </Link>
-        <p className="text-xs text-charcoal/60 font-sans mb-2 line-clamp-1 uppercase tracking-wide">
+        <p className="text-[11px] md:text-xs text-charcoal/60 font-sans mb-2 line-clamp-1 uppercase tracking-wide">
           {product.category || 'Dress'}
         </p>
 
         <div className="flex-grow"></div>
 
-        {/* 3. Action Buttons */}
-        <div className="grid grid-cols-2 gap-2 mt-3 pt-4 border-t border-brand-50">
+        {/* 3. Action Buttons with Smaller Text on Mobile */}
+        <div className="flex flex-col sm:flex-row gap-2 mt-3 pt-3 border-t border-brand-50">
           <button 
             onClick={handleAddToCart}
-            className="flex items-center justify-center gap-2 bg-cream text-brand-900 border border-brand-200 py-2.5 rounded-md text-xs font-bold uppercase tracking-wider hover:bg-brand-50 transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 bg-cream text-brand-900 border border-brand-200 py-2 sm:py-2.5 rounded-md text-[11px] sm:text-xs font-bold uppercase tracking-wider hover:bg-brand-50 transition-colors"
           >
-            <ShoppingBag size={14} />
+            <ShoppingBag size={13} />
             Add
           </button>
           
           <button 
             onClick={handleBuyNow}
-            className="flex items-center justify-center gap-2 bg-brand-900 text-white py-2.5 rounded-md text-xs font-bold uppercase tracking-wider hover:bg-brand-700 transition-colors shadow-sm"
+            className="w-full flex items-center justify-center gap-1.5 bg-brand-900 text-white py-2 sm:py-2.5 rounded-md text-[11px] sm:text-xs font-bold uppercase tracking-wider hover:bg-brand-700 transition-colors shadow-sm"
           >
-            <Zap size={14} />
+            <Zap size={13} />
             Buy Now
           </button>
         </div>

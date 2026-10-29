@@ -7,8 +7,6 @@ import HeroSlider from '@/components/home/HeroSlider';
 import LeadCapture from '@/components/home/LeadCapture';
 import ProductCard from '@/components/product/ProductCard';
 
-
-
 export default function Home() {
   const [trendingProducts, setTrendingProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +21,6 @@ export default function Home() {
         const allProducts = Array.isArray(data) ? data : data.products || [];
         
         // 🔥 YAHAN HAI AAPKA ASALI CONTROL
-        // Ye line database ko bolegi: "Sirf wahi products laao jisme isFeatured true ho ook"
         const selectedProducts = allProducts.filter((product: any) => product.isFeatured === true);
         
         setTrendingProducts(selectedProducts);
@@ -58,10 +55,19 @@ export default function Home() {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-900"></div>
           </div>
         ) : trendingProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-            {trendingProducts.map((product) => (
-              <ProductCard key={product._id || product.id} product={product} />
-            ))}
+          /* 🚀 MOBILE ME DUAL CARDS (grid-cols-2) AUR ODD ITEM KO LAST ME CENTER/STRETCH KARNE KE LIYE */
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-8 gap-y-8 md:gap-y-12">
+            {trendingProducts.map((product, index) => {
+              const isLastAndOdd = trendingProducts.length % 2 !== 0 && index === trendingProducts.length - 1;
+              return (
+                <div 
+                  key={product._id || product.id} 
+                  className={isLastAndOdd ? "col-span-2 sm:col-span-1 max-w-[50%] sm:max-w-none mx-auto sm:mx-0 w-full" : "w-full"}
+                >
+                  <ProductCard product={product} />
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="text-center text-gray-500 py-8 border border-dashed border-gray-300 rounded-lg">

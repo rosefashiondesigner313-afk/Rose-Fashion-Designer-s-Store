@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronDown, SlidersHorizontal, X, ShoppingBag, Star } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal, X, ShoppingBag, Zap, Star } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
 
 export default function ShopPage() {
@@ -46,10 +46,10 @@ export default function ShopPage() {
   });
 
   const handleAddToCart = (product: any, e: React.MouseEvent) => {
-    e.preventDefault(); // Click karne par link trigger na ho
+    e.preventDefault(); 
     const defaultSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'M';
     addToCart({
-      id: product._id,
+      id: `${product._id}-${defaultSize}`,
       name: product.name,
       price: product.price,
       image: product.images[0],
@@ -58,6 +58,11 @@ export default function ShopPage() {
     });
     setToast(`✅ ${product.name} added to cart!`);
     setTimeout(() => setToast(''), 3000);
+  };
+
+  const handleBuyNow = (product: any, e: React.MouseEvent) => {
+    handleAddToCart(product, e);
+    // window location handled via router if needed or let cart handle
   };
 
   if (loading) {
@@ -166,7 +171,7 @@ export default function ShopPage() {
             />
           )}
 
-      {/* Product Grid */}
+          {/* Product Grid */}
           <main className="w-full md:w-3/4">
             <div className="hidden md:flex justify-between items-center mb-6">
               <span className="text-sm text-gray-500">Showing {filteredProducts.length} results</span>
@@ -178,9 +183,10 @@ export default function ShopPage() {
             </div>
 
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              /* 🚀 MOBILE ME DUAL CARDS (grid-cols-2) AUR ODD ITEM KO LAST ME CENTER/STRETCH KARNE KE LIYE */
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 md:gap-x-6 gap-y-6 md:gap-y-10">
                 
-                {filteredProducts.map((product) => {
+                {filteredProducts.map((product, index) => {
                   const createSlug = (text: string) => {
                     if (!text) return '';
                     return text
@@ -193,55 +199,72 @@ export default function ShopPage() {
 
                   const productIdentifier = product.slug || createSlug(product.name) || product._id;
                   const hasSecondImage = product.images && product.images.length > 1;
+                  const isLastAndOdd = filteredProducts.length % 2 !== 0 && index === filteredProducts.length - 1;
 
                   return (
-                    <div key={product._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
+                    <div 
+                      key={product._id} 
+                      className={`bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col ${isLastAndOdd ? 'col-span-2 sm:col-span-1 max-w-[50%] sm:max-w-none mx-auto sm:mx-0 w-full' : 'w-full'}`}
+                    >
                       
-                      {/* 🚀 IMAGE CLICKABLE LINK TO DETAILED PAGE */}
-                      <Link href={`/product/${productIdentifier}`} className="relative h-80 bg-gray-100 overflow-hidden block">
+                      {/* Image Clickable Link */}
+                      <Link href={`/product/${productIdentifier}`} className="relative aspect-[3/4] md:aspect-[4/5] bg-gray-100 overflow-hidden block">
                         {hasSecondImage && (
                           <img 
                             src={product.images[1]} 
                             alt={`${product.name} view`} 
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 z-0" 
+                            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 z-0" 
                           />
                         )}
                         <img 
                           src={product.images[0]} 
                           alt={product.name} 
-                          className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 z-10 ${hasSecondImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`} 
+                          className={`absolute inset-0 w-full h-full object-cover object-top transition-all duration-700 z-10 ${hasSecondImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`} 
                         />
 
                         {!product.inStock && (
-                          <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md z-20">Sold Out</div>
+                          <div className="absolute top-2 right-2 bg-red-500 text-white text-[9px] md:text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md z-20">Sold Out</div>
                         )}
                         {product.isFeatured && product.inStock && (
-                          <div className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md z-20">
-                            <Star size={12} className="fill-yellow-900" /> Featured
+                          <div className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-[9px] md:text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md z-20">
+                            <Star size={10} className="fill-yellow-900" /> Featured
                           </div>
                         )}
                       </Link>
 
-                      <div className="p-5 flex flex-col flex-grow">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">{product.category}</p>
+                      <div className="p-3 md:p-5 flex flex-col flex-grow text-center">
+                        <p className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 line-clamp-1">{product.category}</p>
                         
-                        {/* 🚀 TITLE CLICKABLE LINK TO DETAILED PAGE */}
                         <Link href={`/product/${productIdentifier}`}>
-                          <h3 className="font-bold text-charcoal text-lg mb-2 line-clamp-2 hover:text-brand-900 cursor-pointer">{product.name}</h3>
+                          <h3 className="font-serif font-bold text-charcoal text-xs md:text-lg mb-1 line-clamp-1 group-hover:text-brand-900 cursor-pointer">{product.name}</h3>
                         </Link>
                         
-                        <div className="flex items-center gap-3 mb-5 mt-auto">
-                          <span className="font-bold text-xl text-brand-900">₹{product.price.toLocaleString()}</span>
-                          {product.mrp && <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
+                        <div className="flex items-center justify-center gap-2 mb-3 mt-1">
+                          <span className="font-bold text-sm md:text-xl text-brand-900">₹{product.price.toLocaleString()}</span>
+                          {product.mrp && <span className="text-[10px] md:text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
                         </div>
                         
-                        <button 
-                          onClick={(e) => handleAddToCart(product, e)}
-                          disabled={!product.inStock}
-                          className="w-full py-3 rounded-lg bg-brand-900 text-cream font-bold text-sm hover:bg-brand-800 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                        >
-                          <ShoppingBag size={18} /> {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                        </button>
+                        <div className="flex-grow"></div>
+
+                        {/* Action Buttons: Mobile me upar-niche (col), Desktop par aaju-baaju (row) */}
+                        <div className="flex flex-col sm:flex-row gap-1.5 mt-2 pt-3 border-t border-brand-50">
+                          <button 
+                            onClick={(e) => handleAddToCart(product, e)}
+                            disabled={!product.inStock}
+                            className="w-full py-2 sm:py-2.5 rounded-md bg-cream text-brand-900 border border-brand-200 font-bold text-[10px] sm:text-xs uppercase tracking-wider hover:bg-brand-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-1"
+                          >
+                            <ShoppingBag size={12} /> Add
+                          </button>
+
+                          <Link 
+                            href="/cart"
+                            onClick={(e) => handleAddToCart(product, e)}
+                            className="w-full py-2 sm:py-2.5 rounded-md bg-brand-900 text-cream font-bold text-[10px] sm:text-xs uppercase tracking-wider hover:bg-brand-800 transition-colors shadow-sm flex justify-center items-center gap-1 text-center"
+                          >
+                            <Zap size={12} /> Buy Now
+                          </Link>
+                        </div>
+
                       </div>
                     </div>
                   );

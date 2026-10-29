@@ -124,7 +124,7 @@ export default function CartPage() {
 
               <div className="flex justify-between items-center mb-8">
                 <span className="font-bold text-lg text-charcoal uppercase">Total Amount</span>
-                <span className="font-serif text-3xl font-bold text-brand-900">₹{getCartTotal()}</span>
+                <span className="font-sans text-3xl font-bold text-brand-900">₹{getCartTotal()}</span>
               </div>
 
               <Link 

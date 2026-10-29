@@ -1,18 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; // 🚀 Router import kiya direct checkout ke liye
 import { Product } from '@/types';
 import { useCart } from '@/lib/CartContext';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Zap } from 'lucide-react';
 
 export default function AddToCartForm({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const { addToCart } = useCart();
+  const router = useRouter();
 
   const handleAddToCart = () => {
     addToCart({
-      id: `${product.id}-${selectedSize}`, // Yahan se bhi color hata diya
+      id: `${product.id}-${selectedSize}`, 
       name: product.name,
       price: product.price,
       image: product.images[0],
@@ -20,9 +22,13 @@ export default function AddToCartForm({ product }: { product: Product }) {
       quantity: 1
     });
   };
-  
- 
 
+  // 🚀 Direct Buy Now Function: Cart me daal kar turant cart/checkout page par bhej dega
+  const handleBuyNow = () => {
+    handleAddToCart();
+    router.push('/cart');
+  };
+  
   return (
     <div className="mt-4 space-y-6">
       {/* Color Selection */}
@@ -60,13 +66,13 @@ export default function AddToCartForm({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* Action Area: Twin Buttons (Price & Add to Cart) */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 mt-8 pt-6 border-t border-gray-200">
+      {/* Action Area: Price Box & Twin Buttons (Add to Cart & Buy Now) */}
+      <div className="space-y-4 mt-8 pt-6 border-t border-gray-200">
         
-        {/* Price Box (Looks like a button) */}
-        <div className="w-full sm:w-1/2 flex items-center justify-center gap-2 bg-white border-2 border-brand-900 py-4 px-4 rounded-sm shadow-sm text-brand-900">
+        {/* Price Box */}
+        <div className="w-full flex items-center justify-center gap-2 bg-white border-2 border-brand-900 py-3 px-4 rounded-sm shadow-sm text-brand-900">
           <span className="text-xs uppercase tracking-widest font-semibold text-charcoal/70 mt-1">Total:</span>
-          <span className="text-xl font-serif font-bold">
+          <span className="text-xl font-sans font-bold">
             ₹{product.price.toLocaleString('en-IN')}
           </span>
           {product.originalPrice && (
@@ -76,13 +82,22 @@ export default function AddToCartForm({ product }: { product: Product }) {
           )}
         </div>
 
-        {/* Add to Cart Button */}
-        <button 
-          onClick={handleAddToCart}
-          className="w-full sm:w-1/2 flex items-center justify-center gap-2 bg-brand-900 border-2 border-brand-900 text-cream py-4 px-4 rounded-sm font-bold uppercase tracking-widest hover:bg-brand-700 hover:border-brand-700 transition-colors shadow-md hover:shadow-lg"
-        >
-          <ShoppingBag size={20} /> Add to Cart
-        </button>
+        {/* Buttons Grid: Add to Cart & Direct Buy Now */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button 
+            onClick={handleAddToCart}
+            className="w-full flex items-center justify-center gap-2 bg-cream border-2 border-brand-900 text-brand-900 py-3.5 px-4 rounded-sm font-bold uppercase tracking-widest hover:bg-brand-50 transition-colors shadow-sm"
+          >
+            <ShoppingBag size={18} /> Add to Cart
+          </button>
+
+          <button 
+            onClick={handleBuyNow}
+            className="w-full flex items-center justify-center gap-2 bg-brand-900 border-2 border-brand-900 text-cream py-3.5 px-4 rounded-sm font-bold uppercase tracking-widest hover:bg-brand-700 transition-colors shadow-md"
+          >
+            <Zap size={18} /> Buy Now
+          </button>
+        </div>
         
       </div>
     </div>
